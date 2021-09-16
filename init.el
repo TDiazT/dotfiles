@@ -398,6 +398,12 @@
   :defer t
   :hook (org-mode . tdtron/org-mode-visual-fill))
 
+;; Revert Dired and other buffers
+(setq global-auto-revert-non-file-buffers t)
+
+;; Revert buffers when the underlying file has changed
+(global-auto-revert-mode 1)
+
 (with-eval-after-load 'org
   (org-babel-do-load-languages
    'org-babel-load-languages
@@ -602,6 +608,7 @@
   (setq coq-prog-name "/Users/tomas/.opam/_coq-platform_.2021.02.1/bin/coqtop")
   (setq proof-three-window-mode-policy 'hybrid) ;; Set default layout to hybrid
   (setq proof-three-window-enable t) ;; Set 3 window enabled
+;; proof-locked-face allows customizing background color I think
   )
 
 (use-package company-coq

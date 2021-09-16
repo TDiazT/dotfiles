@@ -569,6 +569,17 @@ Only have one buffer for dired
     :hook (org-mode . tdtron/org-mode-visual-fill))
 
 #+end_src
+*** Auto-reverting changed files
+#+begin_src emacs-lisp
+
+;; Revert Dired and other buffers
+(setq global-auto-revert-non-file-buffers t)
+
+;; Revert buffers when the underlying file has changed
+(global-auto-revert-mode 1)
+
+
+#+end_src
 ** Configure Babel Languages
 
 #+begin_src emacs-lisp
@@ -829,6 +840,7 @@ Only have one buffer for dired
     (setq coq-prog-name "/Users/tomas/.opam/_coq-platform_.2021.02.1/bin/coqtop")
     (setq proof-three-window-mode-policy 'hybrid) ;; Set default layout to hybrid
     (setq proof-three-window-enable t) ;; Set 3 window enabled
+  ;; proof-locked-face allows customizing background color I think
     )
 
   (use-package company-coq
