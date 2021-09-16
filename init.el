@@ -297,8 +297,8 @@
 
 (defhydra hydra-coq ()
   "Coq actions"
-  ("k" proof-assert-next-command-interactive "Next")
-  ("j" proof-undo-last-successful-command "Undo")
+  ("j" proof-assert-next-command-interactive "Next")
+  ("k" proof-undo-last-successful-command "Undo")
   ("f" nil "finished" :exit t)
   )
 
@@ -308,6 +308,13 @@
   ("k" text-scale-decrease "out")
   ("f" nil "finished" :exit t)
   )
+
+(tdtron/leader-keys
+  "c" '(hydra-coq/body :which-key "coq")
+  )
+
+(tdtron/leader-keys
+  "s" '(hydra-text-scale/body :which-key "scale text"))
 
 (defun tdtron/org-font-setup ()
   ;; Replace list hyphen with dot
@@ -446,7 +453,7 @@
   :bind (("M-x" . counsel-M-x)
          ("C-x b" . counsel-ibuffer)
          ("C-x C-f" . counsel-find-file)
-         ;; ("C-M-j" . counsel-switch-buffer)
+         ("C-M-j" . counsel-switch-buffer)
          ("C-M-l" . counsel-imenu)
          :map minibuffer-local-map
          ("C-r" . 'counsel-minibuffer-history))
@@ -518,8 +525,23 @@
   :custom
   (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
 
-;; Forge
-;; (use-package forge)
+  ;; Forge
+  ;; (use-package forge)
+
+(tdtron/leader-keys
+  "g"   '(:ignore t :which-key "git")
+  "gs"  'magit-status
+  "gd"  'magit-diff-unstaged
+  "gc"  'magit-branch-or-checkout
+  "gl"   '(:ignore t :which-key "log")
+  "glc" 'magit-log-current
+  "glf" 'magit-log-buffer-file
+  "gb"  'magit-branch
+  "gP"  'magit-push-current
+  "gp"  'magit-pull-branch
+  "gf"  'magit-fetch
+  "gF"  'magit-fetch-all
+  "gr"  'magit-rebase)
 
 (use-package proof-general
   :config
