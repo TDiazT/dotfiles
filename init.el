@@ -418,6 +418,60 @@
   ;; (add-to-list 'org-structure-template-alist '("coq" . "src coq"))
   )
 
+;; Let's you insert without confirming.
+;; Uses the first template for the immediate nodes (ie. default right now)
+;; Source: https://systemcrafters.net/build-a-second-brain-in-emacs/5-org-roam-hacks/
+(defun org-roam-node-insert-immediate (arg &rest args)
+  (interactive "P")
+  (let ((args (cons arg args))
+        (org-roam-capture-templates (list (append (car org-roam-capture-templates)
+                                                  '(:immediate-finish t)))))
+    (apply #'org-roam-node-insert args)))
+
+(use-package org-roam
+  :init
+  (setq org-roam-v2-ack t)
+
+  :config
+  (org-roam-db-autosync-mode)
+
+  :custom
+  (org-roam-directory "~/Projects/Notes")
+  (org-roam-completion-everywhere t)
+  (org-roam-completion-system 'default)
+  (org-roam-capture-templates
+   '(("d" "default" plain "%?"
+      :target (file+head "%<%Y%m%d%H%M%S>-${slug}.org"
+                         "#+title: ${title}\n")
+      :unnarrowed t)
+
+     ("p" "Paper" plain
+      (file "~/Projects/Notes/templates/PaperTemplate.org")
+      :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org"
+                         "#+title: ${title}\n")
+      :unnarrowed t)
+
+     ("q" "Question" plain
+      (file "~/Projects/Notes/templates/QuestionTemplate.org")
+      :if-new (file+head "~/Projects/Notes/questions/%<%Y%m%d%H%M%S>-${slug}.org"
+                         "#+title: ${title}\n#+filetags: Question")
+      :unnarrowed t)
+
+     )
+   )
+  :bind (("C-c r l" . org-roam-buffer-toggle)
+         ("C-c r f" . org-roam-node-find)
+         ("C-c r g" . org-roam-graph)
+         ("C-c r i" . org-roam-node-insert)
+         ("C-c r I" . org-roam-node-insert-immediate)
+         ("C-c r c" . org-roam-capture)
+         ;; Dailies
+         ("C-c r j" . org-roam-dailies-capture-today)
+         :map org-mode-map
+         ("C-M-i" . completion-at-point)
+         )
+  )
+
 ;; Ivy
 (use-package ivy
   :diminish
