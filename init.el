@@ -214,6 +214,30 @@
 
 (setq-default fill-column 100)
 
+(use-package dired
+  :ensure nil
+  :commands (dired dired-jump)
+
+  :custom
+  ; group-by-directory-first is not available in OS X apparently
+  ; https://github.com/d12frosted/homebrew-emacs-plus/issues/383#issuecomment-899157143
+  (setq insert-directory-program "gls" dired-use-ls-dired t)
+  (setq dired-listing-switches "-agho --group-directories-first")
+  (setq ;;dired-omit-files "^\\.[^.].*"
+   dired-omit-verbose nil
+   dired-hide-details-hide-symlink-targets nil
+   delete-by-moving-to-trash t)
+  :config
+  (setq dired-dwim-target t)
+  :bind ("C-x C-j" . dired-jump)
+  )
+
+(use-package dired-single)
+
+(use-package all-the-icons-dired
+  :hook (dired-mode . all-the-icons-dired-mode)
+  )
+
 (use-package which-key
   :init (which-key-mode)
   :diminish which-key-mode
