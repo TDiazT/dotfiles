@@ -394,16 +394,56 @@ Only have one buffer for dired
 
   (use-package general
     :config
-    (general-create-definer coq-leader-def
-      :keymaps 'coq-mode
-      :prefix "C-c"
-      ;;:global-prefix "C-c"
-      )
-
-    (coq-leader-def
-      "n" '(proof-assert-next-command-interactive :which-key "assert next cmd")
+    (general-create-definer tdtron/leader-keys
+      :keymaps '(normal insert visual emacs)
+      :prefix "SPC"
+      :global-prefix "C-SPC"
       )
     )
+#+end_src
+
+** Evil
+
+#+begin_src emacs-lisp
+  ;; Sets initial evil mode to emacs for these modes
+  ;; (defun tdtron/evil-hook ()
+  ;;   (dolist (mode '(custom-mode
+  ;;                   eshell-mode
+  ;;                   git-rebase-mode
+  ;;                   term-mode))
+  ;;     (add-to-list 'evil-emacs-state-modes mode)))
+
+  (use-package evil
+    :init
+    (setq evil-want-integration t)
+    (setq evil-want-keybinding nil)
+    (setq evil-want-C-u-scroll t)
+    (setq evil-want-C-i-jump nil)
+    (setq evil-respect-visual-line-mode t)
+    (setq evil-undo-system 'undo-tree)
+
+    ;; :hook (evil-mode . tdtron/evil-hook)
+    :config
+    (evil-mode 1)
+    (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
+    (define-key evil-insert-state-map (kbd "C-h") 'evil-delete-backward-char-and-join)
+
+    ;; Use visual line motions even outside of visual-line-mode buffers
+    (evil-global-set-key 'motion "j" 'evil-next-visual-line)
+    (evil-global-set-key 'motion "k" 'evil-previous-visual-line)
+    (evil-set-initial-state 'messages-buffer-mode 'normal)
+    (evil-set-initial-state 'dashboard-mode 'normal))
+
+  (use-package evil-collection
+    :after evil
+    :init
+    (setq evil-collection-company-use-tng nil)  ;; Is this a bug in evil-collection?
+    :custom
+    (evil-collection-outline-bind-tab-p nil)
+    :config
+    (setq evil-collection-mode-list
+          (remove 'lispy evil-collection-mode-list))
+    (evil-collection-init))
 #+end_src
 
 * Stateful keymaps
@@ -411,10 +451,10 @@ Only have one buffer for dired
 
   (use-package hydra)
 
-  (defhydra hydra-coq (:timeout 5)
+  (defhydra hydra-coq ()
     "Coq actions"
-    ("n" proof-assert-next-command-interactive "Next")
-    ("u" proof-undo-last-successful-command "Undo")
+    ("k" proof-assert-next-command-interactive "Next")
+    ("j" proof-undo-last-successful-command "Undo")
     ("f" nil "finished" :exit t)
     )
 
