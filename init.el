@@ -456,7 +456,7 @@
      ("p" "Paper" plain
       (file "~/Projects/Notes/templates/PaperTemplate.org")
       :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org"
-                         "#+title: ${title}\n")
+                         "#+title: ${title}\n#+filetags: Paper")
       :unnarrowed t)
 
      ("q" "Question" plain
