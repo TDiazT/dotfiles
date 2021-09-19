@@ -74,7 +74,7 @@ https://github.com/purcell/exec-path-from-shell
 #+end_src
 
 * Basic UI configuration
-
+** General
 #+begin_src emacs-lisp
 
   (setq inhibit-startup-message t)
@@ -111,9 +111,6 @@ https://github.com/purcell/exec-path-from-shell
     ;; Not sure what this does exactly... and if I'm calling it correctly
     (doom-themes-visual-bell-config)
     )
-
-
-
 #+end_src
 
 ** Font
