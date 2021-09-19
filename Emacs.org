@@ -197,11 +197,11 @@ The [[https:https://github.com/myrjola/diminish.el][diminish]] package hides pes
 
 * Editor
 ** Restore buffers as they were when closed
+Apparently this clashes with Perspective own saved buffers and stuff. emacs-lisp
 #+begin_src emacs-lisp
-
-  (desktop-save-mode 1)
-
+;; (desktop-save-mode 1)
 #+end_src
+
 ** Typed text replaces selection
 Probably not necessary with evil or similar.
 #+begin_src emacs-lisp
@@ -299,6 +299,24 @@ Not entirely sure how these two interact with each other
 #+begin_src emacs-lisp
 
   (setq-default fill-column 100)
+
+#+end_src
+* Workspaces
+#+begin_src emacs-lisp
+
+    (use-package perspective
+      :demand t
+      :bind (("C-M-k" . persp-switch)
+             ("C-M-n" . persp-next)
+             ("C-x k" . persp-kill-buffer*)
+             ("C-x b" . persp-counsel-switch-buffer))
+      :custom
+      (persp-initial-frame-name "Main")
+      :config
+      ;; Running `persp-mode' multiple times resets the perspective list...
+      (unless (equal persp-mode t)
+        (persp-mode)))
+
 
 #+end_src
 
@@ -671,9 +689,9 @@ Because we're rebinding C-u in evil mode for scrolling, we reset the previous bi
   (use-package counsel
     :demand t
     :bind (("M-x" . counsel-M-x)
-           ("C-x b" . counsel-ibuffer)
+           ;; ("C-x b" . counsel-ibuffer)
            ("C-x C-f" . counsel-find-file)
-           ("C-M-j" . counsel-switch-buffer)
+           ;; ("C-M-j" . counsel-switch-buffer)
            ("C-M-l" . counsel-imenu)
            :map minibuffer-local-map
            ("C-r" . 'counsel-minibuffer-history))

@@ -126,7 +126,7 @@
   (doom-modeline-major-mode-icon nil)
   )
 
-(desktop-save-mode 1)
+;; (desktop-save-mode 1)
 
 (delete-selection-mode 1)
 
@@ -191,6 +191,18 @@
   (setq super-save-auto-save-when-idle t))
 
 (setq-default fill-column 100)
+
+(use-package perspective
+  :demand t
+  :bind (("C-M-k" . persp-switch)
+         ("C-M-n" . persp-next)
+         ("C-x k" . persp-kill-buffer*))
+  :custom
+  (persp-initial-frame-name "Main")
+  :config
+  ;; Running `persp-mode' multiple times resets the perspective list...
+  (unless (equal persp-mode t)
+    (persp-mode)))
 
 (use-package dired
   :ensure nil
