@@ -223,18 +223,6 @@ Probably not necessary with evil or similar.
     (add-hook mode (lambda () (display-line-numbers-mode 0))))
 
 #+end_src
-** Expand region
-Increasingly select more (might be unnecessary if using other things, like evil?)
-
-#+begin_src emacs-lisp
-
-  ;; expand-region, let's you increase the selection by regions
-  (use-package expand-region
-    :ensure t
-    :bind ("M-<up>" . er/expand-region))
-
-#+end_src
-
 ** Select next occurrence
 #+begin_src emacs-lisp
 
@@ -279,33 +267,6 @@ Increasingly select more (might be unnecessary if using other things, like evil?
 
   (global-set-key (kbd "C-S-<up>") 'ach-move-line-up)
   (global-set-key (kbd "C-S-<down>") 'ach-move-line-down)
-
-#+end_src
-
-** Delete whole line
-Probably not necessary with evil or similar.
-#+begin_src emacs-lisp
-
-  (add-hook 'after-init-hook
-            '(lambda ()
-               (global-set-key (kbd "C-<backspace>") 'kill-whole-line)
-               )
-            )
-
-#+end_src
-** Duplicate line
-#+begin_src emacs-lisp
-
-  (defun duplicate-line()
-    (interactive)
-    (move-beginning-of-line 1)
-    (kill-line)
-    (yank)
-    (open-line 1)
-    (next-line 1)
-    (yank)
-    )
-  (global-set-key (kbd "C-d") 'duplicate-line)
 
 #+end_src
 

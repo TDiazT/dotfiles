@@ -140,11 +140,6 @@
 (dolist (mode '(org-mode-hook))
   (add-hook mode (lambda () (display-line-numbers-mode 0))))
 
-;; expand-region, let's you increase the selection by regions
-(use-package expand-region
-  :ensure t
-  :bind ("M-<up>" . er/expand-region))
-
 ;; Multiple-cursors, let's you have multiple cursors
 (use-package multiple-cursors
   :ensure t
@@ -180,23 +175,6 @@
 
 (global-set-key (kbd "C-S-<up>") 'ach-move-line-up)
 (global-set-key (kbd "C-S-<down>") 'ach-move-line-down)
-
-(add-hook 'after-init-hook
-          '(lambda ()
-             (global-set-key (kbd "C-<backspace>") 'kill-whole-line)
-             )
-          )
-
-(defun duplicate-line()
-  (interactive)
-  (move-beginning-of-line 1)
-  (kill-line)
-  (yank)
-  (open-line 1)
-  (next-line 1)
-  (yank)
-  )
-(global-set-key (kbd "C-d") 'duplicate-line)
 
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
 
