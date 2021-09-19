@@ -446,6 +446,11 @@ Only have one buffer for dired
     (evil-collection-init))
 #+end_src
 
+Because we're rebinding C-u in evil mode for scrolling, we reset the previous binding.
+#+begin_src emacs-lisp
+  (global-set-key (kbd "C-M-u") 'universal-argument)
+#+end_src
+
 * Stateful keymaps
 #+begin_src emacs-lisp
 

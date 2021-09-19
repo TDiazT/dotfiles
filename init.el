@@ -293,6 +293,8 @@
         (remove 'lispy evil-collection-mode-list))
   (evil-collection-init))
 
+(global-set-key (kbd "C-M-u") 'universal-argument)
+
 (use-package hydra)
 
 (defhydra hydra-coq ()
