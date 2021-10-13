@@ -740,7 +740,7 @@ Because we're rebinding C-u in evil mode for scrolling, we reset the previous bi
   ;;   :hook (prog-mode . smartparens-mode))
 
   ;; ;;
-  Highlight matching parens
+  ;; Highlight matching parens
   (use-package paren
     :config
     (set-face-attribute 'show-paren-match-expression nil :background "#363e4a")

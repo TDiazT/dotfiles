@@ -1,0 +1,374 @@
+#+title Emacs config
+#+PROPERTY: header-args:emacs-lisp :tangle ./init.el
+* Startup performance
+#+begin_src emacs-lisp
+
+  ;; The default is 800 kilobytes.  Measured in bytes.
+  (setq gc-cons-threshold (* 50 1000 1000))
+
+  ;; Profile emacs startup
+  (add-hook 'emacs-startup-hook
+            (lambda ()
+              (message "*** Emacs loaded in %s with %d garbage collections."
+                       (format "%.2f seconds"
+                               (float-time
+                                (time-subtract after-init-time before-init-time)))
+                       gcs-done)))
+
+#+end_src
+
+* Setup
+** OS X Meta rebinding
+Changing the command key to be the META key in Emacs.
+
+#+begin_src emacs-lisp
+
+  (setq mac-command-modifier 'meta)
+
+#+end_src
+** Env variables
+
+A GNU Emacs library to ensure environment variables inside Emacs look the same as in the user's shell.
+Particularly useful for OS X.
+https://github.com/purcell/exec-path-from-shell
+
+#+begin_src emacs-lisp
+
+  (use-package exec-path-from-shell
+    :init
+    (when (memq window-system '(mac ns x))
+      (exec-path-from-shell-initialize)) ;; Initialize environment from the user's shell
+    )
+
+#+end_src
+
+** Package management
+
+#+begin_src emacs-lisp
+
+  (require 'package)
+  (setq package-archives '(("melpa" . "https://melpa.org/packages/")
+                           ;; Comment/uncomment this line to enable MELPA Stable if desired.
+                           ;; See `package-archive-priorities`
+                           ;; and `package-pinned-packages`.
+                           ;; Most users will not need or want to do this.
+                           ;; ("melpa-stable" . "https://stable.melpa.org/packages/")
+                           ("org" . "https://orgmode.org/elpa/")
+                           ("elpa" . "https://elpa.gnu.org/packages/")))
+
+  (package-initialize)
+
+  ;; Update package contents right away if not updated
+  (unless package-archive-contents
+    (package-refresh-contents))
+
+  ;; Install use-package right away if not installed
+  (unless (package-installed-p 'use-package)
+    (package-install 'use-package))
+
+  ;; All packages with use-package are :ensure t
+  (require 'use-package)
+  (setq use-package-always-ensure t)
+
+#+end_src
+
+* Basic UI configuration
+
+#+begin_src emacs-lisp
+
+  (setq inhibit-startup-message t)
+  (scroll-bar-mode -1)        ; Disable visible scrollbar
+  (tool-bar-mode -1)          ; Disable the toolbar
+  (tooltip-mode -1)           ; Disable tooltips
+  (set-fringe-mode 10)       ; Give some breathing room
+
+  (menu-bar-mode -1)            ; Disable the menu bar
+
+  ;; Set up the visible bell
+  (setq visible-bell t)
+
+  ;; Improve scrolling
+  (setq mouse-wheel-scroll-amount '(1 ((shift) . 1))) ;; one line at a time
+  (setq mouse-wheel-progressive-speed nil) ;; don't accelerate scrolling
+  (setq mouse-wheel-follow-mouse 't) ;; scroll window under mouse
+  (setq scroll-step 1) ;; keyboard scroll one line at a time
+  (setq use-dialog-box nil) ;; Disable dialog boxes since they weren't working in Mac OSX
+
+#+end_src
+
+** Theme
+
+#+begin_src emacs-lisp
+  (use-package doom-themes
+    :init
+    (load-theme 'doom-palenight t)
+    ;; Not sure what this does exactly... and if I'm calling it correctly
+    (doom-themes-visual-bell-config)
+    )
+
+
+
+#+end_src
+
+** Font
+
+#+begin_src emacs-lisp
+
+  (set-face-attribute 'default nil :font "Fira Mono" :height 150)
+
+  ;; Set the fixed pitch face
+  (set-face-attribute 'fixed-pitch nil
+                      :font "JetBrains Mono"
+                      :weight 'light
+                      :height 150)
+
+  ;; Set the variable pitch face
+  (set-face-attribute 'variable-pitch nil
+                      :font "Iosevka Aile"
+                      :height 150
+                      :weight 'light)
+
+#+end_src
+
+** Modeline
+*** Basic config
+
+#+begin_src emacs-lisp
+  ;; Not sure if this is doing anything...
+  (setq display-time-format "%l:%M %p %b %y"
+          display-time-default-load-average nil)
+#+end_src
+
+*** Enable Mode Diminish
+
+The [[https:https://github.com/myrjola/diminish.el][diminish]] package hides pesky minor modes from the modelines.
+
+#+begin_src emacs-lisp
+  (use-package diminish)
+#+end_src
+
+*** Doom modeline
+
+#+begin_src emacs-lisp
+
+  ;; Necessary for doom modeline
+  (use-package all-the-icons)
+
+  ;; Doom modeline
+  ;; You must run (M-x all-the-icons-install-fonts) one time after
+  ;; installing this package!
+  ;; Not sure if necessary with the previous use-package call
+
+  ;; Double check what this is for lol
+  (use-package minions
+    :hook (doom-modeline-mode . minions-mode))
+
+  (use-package doom-modeline
+    :init (doom-modeline-mode 1)
+    :hook (after-init . doom-modeline-init)
+    :custom-face
+    (mode-line ((t (:height 0.85))))
+    (mode-line-inactive ((t (:height 0.85))))
+    :custom
+    (doom-modeline-height 15)
+    (doom-modeline-bar-width 6)
+    (doom-modeline-lsp t)
+    (doom-modeline-github nil)
+    (doom-modeline-mu4e nil)
+    (doom-modeline-irc t)
+    (doom-modeline-minor-modes t)
+    (doom-modeline-persp-name nil)
+    (doom-modeline-buffer-file-name-style 'truncate-except-project)
+    (doom-modeline-major-mode-icon nil)
+    )
+
+#+end_src
+
+* Editor
+
+** Expand region
+Increasingly select more (might be unnecessary if using other things, like evil?)
+
+#+begin_src emacs-lisp
+
+  ;; expand-region, let's you increase the selection by regions
+  (use-package expand-region
+    :ensure t
+    :bind ("M-<up>" . er/expand-region))
+
+#+end_src
+
+
+** Select next occurrence
+#+begin_src emacs-lisp
+
+  ;; Multiple-cursors, let's you have multiple cursors
+  (use-package multiple-cursors
+    :ensure t
+    :bind
+    (("C->"         . mc/mark-next-like-this)
+     ("C-<"         . mc/mark-previous-like-this)
+     ("C-c C-<"     . mc/mark-all-like-this)
+     ("C-S-c C-S-c"   . mc/edit-lines)
+     )
+    )
+
+#+end_src
+
+** Transpose lines
+
+#+begin_src emacs-lisp
+
+  ;; Taken from https://github.com/anachronic/emacs.d/blob/master/elisp/setup-editor.el
+  ;; Let's you transpose lines like IntelliJ
+  (defun ach-move-line-up ()
+    "Transpose the current line with the one above leaving the cursor in the first line."
+    (interactive)
+    (let ((col (current-column)))
+      (transpose-lines 1)
+      (forward-line -2)
+      (move-beginning-of-line 1)
+      (forward-char col)))
+
+
+  (defun ach-move-line-down ()
+    "Transpose the current line with the one below leaving the cursor in the first line."
+    (interactive)
+    (let ((col (current-column)))
+      (forward-line 1)
+      (transpose-lines 1)
+      (forward-line -1)
+      (move-beginning-of-line 1)
+      (forward-char col)))
+
+  (global-set-key (kbd "C-S-<up>") 'ach-move-line-up)
+  (global-set-key (kbd "C-S-<down>") 'ach-move-line-down)
+
+#+end_src
+
+
+* Org mode
+
+** Configure Babel Languages
+
+#+begin_src emacs-lisp
+
+  (with-eval-after-load 'org
+    (org-babel-do-load-languages
+        'org-babel-load-languages
+        '((emacs-lisp . t)
+          ;; Coq apparently is not working with Babel - https://emacs.stackexchange.com/q/58369/34589
+          ;; With newer Coq versions, the file 'coq-inferior.el' is no longer packaged with it
+          ;; (coq . t)
+          )
+        )
+    )
+
+#+end_src
+
+** Configure templates
+
+#+begin_src emacs-lisp
+
+  (with-eval-after-load 'org
+    ;; This is needed as of Org 9.2
+    (require 'org-tempo)
+
+    (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
+    ;; See org lang load - TLDR: Coq is not working with babel rn
+    ;; (add-to-list 'org-structure-template-alist '("coq" . "src coq"))
+  )
+
+
+#+end_src
+
+* Better completion with Ivy
+
+#+begin_src emacs-lisp
+
+  ;; Ivy
+  (use-package ivy
+    :diminish
+    :bind (("C-s" . swiper)
+           :map ivy-minibuffer-map
+           ("TAB" . ivy-alt-done)
+           ("C-f" . ivy-alt-done)
+           ("C-l" . ivy-alt-done)
+           ("C-j" . ivy-next-line)
+           ("C-k" . ivy-previous-line)
+           :map ivy-switch-buffer-map
+           ("C-k" . ivy-previous-line)
+           ("C-l" . ivy-done)
+           ("C-d" . ivy-switch-buffer-kill)
+           :map ivy-reverse-i-search-map
+           ("C-k" . ivy-previous-line)
+           ("C-d" . ivy-reverse-i-search-kill))
+    :init
+    (ivy-mode 1) ;; This sets everything up, including remapping find file to use Ivy
+    )
+
+  ;; Ivy rich
+  (use-package ivy-rich
+    :init (ivy-rich-mode 1)
+    )
+
+
+  ;; Counsel
+  ;; General user interface (UI) to narrow down a list of selections by typing.
+  ;; Same devs as Ivy
+  (use-package counsel
+    :demand t
+    :bind (("M-x" . counsel-M-x)
+           ("C-x b" . counsel-ibuffer)
+           ("C-x C-f" . counsel-find-file)
+           ;; ("C-M-j" . counsel-switch-buffer)
+           ("C-M-l" . counsel-imenu)
+           :map minibuffer-local-map
+           ("C-r" . 'counsel-minibuffer-history))
+    :config
+    (setq ivy-initial-inputs-alist nil)) ;; Don't start searches with ^
+
+
+  ;; Swiper
+  ;; I think Swiper comes with ivy installation
+  (use-package swiper)
+
+#+end_src
+
+* Development
+** Coq
+
+#+begin_src emacs-lisp
+
+
+  ;; Coq Proof General
+  (use-package proof-general
+    :config
+    (setq coq-prog-name "/Users/tomas/.opam/_coq-platform_.2021.02.1/bin/coqtop")
+    (setq proof-three-window-mode-policy 'hybrid) ;; Set default layout to hybrid
+    (setq proof-three-window-enable t) ;; Set 3 window enabled
+    )
+
+  ;; Company-Coq
+  (use-package company-coq
+    :init
+    ;; Load company-coq when opening Coq files
+    (add-hook 'coq-mode-hook #'company-coq-mode))
+
+
+#+end_src
+** Emacs Lisp
+
+#+begin_src emacs-lisp
+
+  (use-package helpful
+    :custom
+    (counsel-describe-function-function #'helpful-callable)
+    (counsel-describe-variable-function #'helpful-variable)
+    :bind
+    ([remap describe-function] . helpful-function)
+    ([remap describe-symbol] . helpful-symbol)
+    ([remap describe-variable] . helpful-variable)
+    ([remap describe-command] . helpful-command)
+    ([remap describe-key] . helpful-key))
+#+end_src

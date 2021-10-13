@@ -126,7 +126,7 @@
   (doom-modeline-major-mode-icon nil)
   )
 
-;; (desktop-save-mode 1)
+(desktop-save-mode 1)
 
 (delete-selection-mode 1)
 
@@ -139,6 +139,11 @@
 ;; Override some modes which derive from the above
 (dolist (mode '(org-mode-hook))
   (add-hook mode (lambda () (display-line-numbers-mode 0))))
+
+;; expand-region, let's you increase the selection by regions
+(use-package expand-region
+  :ensure t
+  :bind ("M-<up>" . er/expand-region))
 
 ;; Multiple-cursors, let's you have multiple cursors
 (use-package multiple-cursors
@@ -176,6 +181,23 @@
 (global-set-key (kbd "C-S-<up>") 'ach-move-line-up)
 (global-set-key (kbd "C-S-<down>") 'ach-move-line-down)
 
+(add-hook 'after-init-hook
+          '(lambda ()
+             (global-set-key (kbd "C-<backspace>") 'kill-whole-line)
+             )
+          )
+
+(defun duplicate-line()
+  (interactive)
+  (move-beginning-of-line 1)
+  (kill-line)
+  (yank)
+  (open-line 1)
+  (next-line 1)
+  (yank)
+  )
+(global-set-key (kbd "C-d") 'duplicate-line)
+
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
 
 ;; Automatically clean whitespaces
@@ -191,19 +213,6 @@
   (setq super-save-auto-save-when-idle t))
 
 (setq-default fill-column 100)
-
-(use-package perspective
-  :demand t
-  :bind (("C-M-k" . persp-switch)
-         ("C-M-n" . persp-next)
-         ("C-x k" . persp-kill-buffer*)
-         ("C-x b" . persp-counsel-switch-buffer))
-  :custom
-  (persp-initial-frame-name "Main")
-  :config
-  ;; Running `persp-mode' multiple times resets the perspective list...
-  (unless (equal persp-mode t)
-    (persp-mode)))
 
 (use-package dired
   :ensure nil
@@ -251,9 +260,6 @@
 ;;                   git-rebase-mode
 ;;                   term-mode))
 ;;     (add-to-list 'evil-emacs-state-modes mode)))
- (use-package undo-tree
-   :init
-   (global-undo-tree-mode 1))
 
 (use-package evil
   :init
@@ -293,8 +299,8 @@
 
 (defhydra hydra-coq ()
   "Coq actions"
-  ("j" proof-assert-next-command-interactive "Next")
-  ("k" proof-undo-last-successful-command "Undo")
+  ("k" proof-assert-next-command-interactive "Next")
+  ("j" proof-undo-last-successful-command "Undo")
   ("f" nil "finished" :exit t)
   )
 
@@ -306,9 +312,7 @@
   )
 
 (tdtron/leader-keys
-  "c"   '(:ignore t :which-key "coq")
-  "cs"  '(coq-Search :which-key "search")
-  "ci"  '(hydra-coq/body :which-key "interactive")
+  "c" '(hydra-coq/body :which-key "coq")
   )
 
 (tdtron/leader-keys
@@ -402,8 +406,6 @@
 ;; Revert buffers when the underlying file has changed
 (global-auto-revert-mode 1)
 
-(use-package org-download)
-
 (with-eval-after-load 'org
   (org-babel-do-load-languages
    'org-babel-load-languages
@@ -454,7 +456,7 @@
      ("p" "Paper" plain
       (file "~/Projects/Notes/templates/PaperTemplate.org")
       :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org"
-                         "#+title: ${title}\n#+filetags: Paper")
+                         "#+title: ${title}\n")
       :unnarrowed t)
 
      ("q" "Question" plain
@@ -511,9 +513,9 @@
 (use-package counsel
   :demand t
   :bind (("M-x" . counsel-M-x)
-         ;; ("C-x b" . counsel-ibuffer)
+         ("C-x b" . counsel-ibuffer)
          ("C-x C-f" . counsel-find-file)
-         ;; ("C-M-j" . counsel-switch-buffer)
+         ("C-M-j" . counsel-switch-buffer)
          ("C-M-l" . counsel-imenu)
          :map minibuffer-local-map
          ("C-r" . 'counsel-minibuffer-history))
@@ -535,10 +537,9 @@
   :config
   (yas-reload-all))
 
-;; (use-package smartparens
-;;   :hook (prog-mode . smartparens-mode))
+(use-package smartparens
+  :hook (prog-mode . smartparens-mode))
 
-;; ;;
 ;; Highlight matching parens
 (use-package paren
   :config
