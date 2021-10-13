@@ -388,6 +388,9 @@ Only have one buffer for dired
   ;;                   git-rebase-mode
   ;;                   term-mode))
   ;;     (add-to-list 'evil-emacs-state-modes mode)))
+   (use-package undo-tree
+     :init
+     (global-undo-tree-mode 1))
 
   (use-package evil
     :init
@@ -447,7 +450,9 @@ Because we're rebinding C-u in evil mode for scrolling, we reset the previous bi
     )
 
   (tdtron/leader-keys
-    "c" '(hydra-coq/body :which-key "coq")
+    "c"   '(:ignore t :which-key "coq")
+    "cs"  '(coq-Search :which-key "search")
+    "ci"  '(hydra-coq/body :which-key "interactive")
     )
 
   (tdtron/leader-keys
@@ -560,6 +565,10 @@ Because we're rebinding C-u in evil mode for scrolling, we reset the previous bi
 (global-auto-revert-mode 1)
 
 
+#+end_src
+** Image download
+#+begin_src emacs-lisp
+  (use-package org-download)
 #+end_src
 ** Configure Babel Languages
 
@@ -727,10 +736,11 @@ Because we're rebinding C-u in evil mode for scrolling, we reset the previous bi
 ** Better parens
 #+begin_src emacs-lisp
 
-  (use-package smartparens
-    :hook (prog-mode . smartparens-mode))
+  ;; (use-package smartparens
+  ;;   :hook (prog-mode . smartparens-mode))
 
-  ;; Highlight matching parens
+  ;; ;;
+  Highlight matching parens
   (use-package paren
     :config
     (set-face-attribute 'show-paren-match-expression nil :background "#363e4a")

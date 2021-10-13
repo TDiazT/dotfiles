@@ -196,7 +196,8 @@
   :demand t
   :bind (("C-M-k" . persp-switch)
          ("C-M-n" . persp-next)
-         ("C-x k" . persp-kill-buffer*))
+         ("C-x k" . persp-kill-buffer*)
+         ("C-x b" . persp-counsel-switch-buffer))
   :custom
   (persp-initial-frame-name "Main")
   :config
@@ -250,6 +251,9 @@
 ;;                   git-rebase-mode
 ;;                   term-mode))
 ;;     (add-to-list 'evil-emacs-state-modes mode)))
+ (use-package undo-tree
+   :init
+   (global-undo-tree-mode 1))
 
 (use-package evil
   :init
@@ -302,7 +306,9 @@
   )
 
 (tdtron/leader-keys
-  "c" '(hydra-coq/body :which-key "coq")
+  "c"   '(:ignore t :which-key "coq")
+  "cs"  '(coq-Search :which-key "search")
+  "ci"  '(hydra-coq/body :which-key "interactive")
   )
 
 (tdtron/leader-keys
@@ -395,6 +401,8 @@
 
 ;; Revert buffers when the underlying file has changed
 (global-auto-revert-mode 1)
+
+(use-package org-download)
 
 (with-eval-after-load 'org
   (org-babel-do-load-languages
@@ -503,9 +511,9 @@
 (use-package counsel
   :demand t
   :bind (("M-x" . counsel-M-x)
-         ("C-x b" . counsel-ibuffer)
+         ;; ("C-x b" . counsel-ibuffer)
          ("C-x C-f" . counsel-find-file)
-         ("C-M-j" . counsel-switch-buffer)
+         ;; ("C-M-j" . counsel-switch-buffer)
          ("C-M-l" . counsel-imenu)
          :map minibuffer-local-map
          ("C-r" . 'counsel-minibuffer-history))
@@ -527,10 +535,11 @@
   :config
   (yas-reload-all))
 
-(use-package smartparens
-  :hook (prog-mode . smartparens-mode))
+;; (use-package smartparens
+;;   :hook (prog-mode . smartparens-mode))
 
-;; Highlight matching parens
+;; ;;
+Highlight matching parens
 (use-package paren
   :config
   (set-face-attribute 'show-paren-match-expression nil :background "#363e4a")
