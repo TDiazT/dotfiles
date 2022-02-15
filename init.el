@@ -426,7 +426,7 @@
 
   (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
   ;; See org lang load - TLDR: Coq is not working with babel rn
-  ;; (add-to-list 'org-structure-template-alist '("coq" . "src coq"))
+  (add-to-list 'org-structure-template-alist '("coq" . "src coq"))
   )
 
 ;; Let's you insert without confirming.
@@ -626,6 +626,7 @@
 (use-package proof-general
   :config
   (setq coq-prog-name "/Users/tomas/.opam/_coq-platform_.2021.02.1/bin/coqtop")
+  ;; (setq coq-prog-name "/Users/tomas/.opam/coq.8.13/bin/coqtop")
   (setq proof-three-window-mode-policy 'hybrid) ;; Set default layout to hybrid
   (setq proof-three-window-enable t) ;; Set 3 window enabled
 ;; proof-locked-face allows customizing background color I think
