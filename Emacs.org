@@ -33,7 +33,7 @@ Particularly useful for OS X.
 https://github.com/purcell/exec-path-from-shell
 
 #+begin_src emacs-lisp
-
+  ; Follow best practice by setting your environment variables so that they are available to both interactive and non-interactive shells. In practical terms, for most people this means setting them in ~/.profile, ~/.bash_profile, ~/.zshenv instead of ~/.bashrc and ~/.zshrc.
   (when (memq window-system '(mac ns x))
     (use-package exec-path-from-shell
       :init
@@ -757,9 +757,24 @@ Because we're rebinding C-u in evil mode for scrolling, we reset the previous bi
 ** Better parens
 #+begin_src emacs-lisp
 
-  ;; (use-package smartparens
-  ;;   :hook (prog-mode . smartparens-mode))
+    ;; (use-package smartparens
+    ;;   :hook (prog-mode . smartparens-mode))
 
+  ;; Checking paredit for Racket dev
+  (use-package paredit
+    :ensure t
+    :config
+    (dolist (m '(emacs-lisp-mode-hook
+                 racket-mode-hook
+                 racket-repl-mode-hook))
+      (add-hook m #'paredit-mode))
+    (bind-keys :map paredit-mode-map
+               ("{"   . paredit-open-curly)
+               ("}"   . paredit-close-curly))
+    (unless terminal-frame
+      (bind-keys :map paredit-mode-map
+                 ("M-[" . paredit-wrap-square)
+                 ("M-{" . paredit-wrap-curly))))
   ;; ;;
   ;; Highlight matching parens
   (use-package paren
@@ -768,6 +783,8 @@ Because we're rebinding C-u in evil mode for scrolling, we reset the previous bi
     (show-paren-mode 1))
 
 #+end_src
+
+
 ** Better delimiters
 #+begin_src emacs-lisp
 
@@ -885,4 +902,16 @@ Because we're rebinding C-u in evil mode for scrolling, we reset the previous bi
 
   (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
+#+end_src
+** Ocaml
+#+begin_src emacs-lisp
+(use-package tuareg)
+#+end_src
+** Racket
+#+begin_src emacs-lisp
+
+  (use-package racket-mode
+    :hook (racket-mode . racket-xp-mode)
+    :mode "\\.rkt\\'"
+    )
 #+end_src

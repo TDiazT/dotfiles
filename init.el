@@ -12,6 +12,7 @@
 
 (setq mac-command-modifier 'meta)
 
+; Follow best practice by setting your environment variables so that they are available to both interactive and non-interactive shells. In practical terms, for most people this means setting them in ~/.profile, ~/.bash_profile, ~/.zshenv instead of ~/.bashrc and ~/.zshrc.
 (when (memq window-system '(mac ns x))
   (use-package exec-path-from-shell
     :init
@@ -555,8 +556,23 @@
   (yas-reload-all))
 
 ;; (use-package smartparens
-;;   :hook (prog-mode . smartparens-mode))
+  ;;   :hook (prog-mode . smartparens-mode))
 
+;; Checking paredit for Racket dev
+(use-package paredit
+  :ensure t
+  :config
+  (dolist (m '(emacs-lisp-mode-hook
+               racket-mode-hook
+               racket-repl-mode-hook))
+    (add-hook m #'paredit-mode))
+  (bind-keys :map paredit-mode-map
+             ("{"   . paredit-open-curly)
+             ("}"   . paredit-close-curly))
+  (unless terminal-frame
+    (bind-keys :map paredit-mode-map
+               ("M-[" . paredit-wrap-square)
+               ("M-{" . paredit-wrap-curly))))
 ;; ;;
 ;; Highlight matching parens
 (use-package paren
@@ -649,3 +665,10 @@
   ([remap describe-key] . helpful-key))
 
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+
+(use-package tuareg)
+
+(use-package racket-mode
+  :hook (racket-mode . racket-xp-mode)
+  :mode "\\.rkt\\'"
+  )
