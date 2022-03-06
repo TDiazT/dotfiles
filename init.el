@@ -254,7 +254,9 @@
 ;;     (add-to-list 'evil-emacs-state-modes mode)))
  (use-package undo-tree
    :init
-   (global-undo-tree-mode 1))
+   (global-undo-tree-mode 1)
+   :config
+   (setq undo-tree-auto-save-history nil))
 
 (use-package evil
   :init
@@ -289,6 +291,10 @@
   (evil-collection-init))
 
 (global-set-key (kbd "C-M-u") 'universal-argument)
+
+(use-package evil-surround
+  :config
+  (global-evil-surround-mode 1))
 
 (use-package hydra)
 
