@@ -352,6 +352,15 @@ Only have one buffer for dired
     :hook (dired-mode . all-the-icons-dired-mode)
     )
 #+end_src
+** Keeping emacs.d clean
+#+begin_src emacs-lisp
+  (use-package no-littering
+    :custom
+    (setq auto-save-file-name-transforms
+          `((".*" ,(no-littering-expand-var-file-name "auto-save/") t)))
+    (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
+    )
+#+end_src
 
 * Keybinds
 ** Keybinds panel (which-key)

@@ -230,6 +230,13 @@
   :hook (dired-mode . all-the-icons-dired-mode)
   )
 
+(use-package no-littering
+  :custom
+  (setq auto-save-file-name-transforms
+        `((".*" ,(no-littering-expand-var-file-name "auto-save/") t)))
+  (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
+  )
+
 (use-package which-key
   :init (which-key-mode)
   :diminish which-key-mode
