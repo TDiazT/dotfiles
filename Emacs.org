@@ -107,7 +107,7 @@ https://github.com/purcell/exec-path-from-shell
 #+begin_src emacs-lisp
   (use-package doom-themes
     :init
-    (load-theme 'doom-palenight t)
+    (load-theme 'doom-snazzy t)
     ;; Not sure what this does exactly... and if I'm calling it correctly
     (doom-themes-visual-bell-config)
     )
@@ -352,6 +352,15 @@ Only have one buffer for dired
     :hook (dired-mode . all-the-icons-dired-mode)
     )
 #+end_src
+
+Hide files
+#+begin_src emacs-lisp
+  (use-package dired-hide-dotfiles
+    :hook (dired-mode . dired-hide-dotfiles-mode)
+    :config
+    (evil-collection-define-key 'normal 'dired-mode-map
+      "H" 'dired-hide-dotfiles-mode))
+#+end_src
 ** Keeping emacs.d clean
 #+begin_src emacs-lisp
   (use-package no-littering
@@ -360,6 +369,11 @@ Only have one buffer for dired
           `((".*" ,(no-littering-expand-var-file-name "auto-save/") t)))
     (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
     )
+#+end_src
+** Recent file
+#+begin_src emacs-lisp
+  (recentf-mode 1)
+  (global-set-key (kbd "C-M-e") 'recentf-open-files)
 #+end_src
 
 * Keybinds
@@ -801,7 +815,6 @@ Because we're rebinding C-u in evil mode for scrolling, we reset the previous bi
 
 #+end_src
 
-
 ** Better delimiters
 #+begin_src emacs-lisp
 
@@ -816,6 +829,11 @@ Because we're rebinding C-u in evil mode for scrolling, we reset the previous bi
   (use-package evil-nerd-commenter
     :bind ("M-/" . evilnc-comment-or-uncomment-lines))
 
+#+end_src
+** Save minibuffer history
+#+begin_src emacs-lisp
+  (setq history-length 25)
+  (savehist-mode 1)
 #+end_src
 * Development
 ** Project management

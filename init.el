@@ -69,7 +69,7 @@
 
 (use-package doom-themes
   :init
-  (load-theme 'doom-palenight t)
+  (load-theme 'doom-snazzy t)
   ;; Not sure what this does exactly... and if I'm calling it correctly
   (doom-themes-visual-bell-config)
   )
@@ -230,12 +230,21 @@
   :hook (dired-mode . all-the-icons-dired-mode)
   )
 
+(use-package dired-hide-dotfiles
+  :hook (dired-mode . dired-hide-dotfiles-mode)
+  :config
+  (evil-collection-define-key 'normal 'dired-mode-map
+    "H" 'dired-hide-dotfiles-mode))
+
 (use-package no-littering
   :custom
   (setq auto-save-file-name-transforms
         `((".*" ,(no-littering-expand-var-file-name "auto-save/") t)))
   (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
   )
+
+(recentf-mode 1)
+(global-set-key (kbd "C-M-e") 'recentf-open-files)
 
 (use-package which-key
   :init (which-key-mode)
@@ -599,6 +608,9 @@
 
 (use-package evil-nerd-commenter
   :bind ("M-/" . evilnc-comment-or-uncomment-lines))
+
+(setq history-length 25)
+(savehist-mode 1)
 
 (defun tdtron/switch-project-action ()
   "Switch to a workspace with the project name and start `magit-status'."
