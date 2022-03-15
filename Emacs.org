@@ -37,7 +37,7 @@ https://github.com/purcell/exec-path-from-shell
   (when (memq window-system '(mac ns x))
     (use-package exec-path-from-shell
       :init
-      (setq exec-path-from-shell-arguments '("-l"))
+      (setq exec-path-from-shell-arguments nil)
       (exec-path-from-shell-initialize))
     )
 
@@ -195,6 +195,15 @@ The [[https:https://github.com/myrjola/diminish.el][diminish]] package hides pes
 
 #+end_src
 
+** Make scrolling less stuttered
+#+begin_src emacs-lisp
+  (setq auto-window-vscroll nil)
+  (customize-set-variable 'fast-but-imprecise-scrolling t)
+  (customize-set-variable 'scroll-conservatively 101)
+  (customize-set-variable 'scroll-margin 0)
+  (customize-set-variable 'scroll-preserve-screen-position t)
+#+end_src
+
 * Editor
 ** Restore buffers as they were when closed
 Apparently this clashes with Perspective own saved buffers and stuff. emacs-lisp
@@ -301,6 +310,29 @@ Not entirely sure how these two interact with each other
   (setq-default fill-column 100)
 
 #+end_src
+
+** Disable tabs for spaces instead
+#+begin_src emacs-lisp
+  (setq-default indent-tabs-mode nil)
+#+end_src
+
+** y-or-n
+#+begin_src emacs-lisp
+  (fset 'yes-or-no-p 'y-or-n-p)
+#+end_src
+
+** Do not save duplicates in kill-ring
+#+begin_src emacs-lisp
+  (customize-set-variable 'kill-do-not-save-duplicates t)
+#+end_src
+
+** Better support for files with long lines
+#+begin_src emacs-lisp
+  (setq-default bidi-paragraph-direction 'left-to-right)
+  (setq-default bidi-inhibit-bpa t)
+  (global-so-long-mode 1)
+#+end_src
+
 * Workspaces
 #+begin_src emacs-lisp
 

@@ -1,0 +1,129 @@
+#+title Org-mode config
+#+PROPERTY: header-args:emacs-lisp :tangle ./tdtron-org.el :mkdirp yes
+
+#+begin_src emacs-lisp
+  ;;; tdtron-org.el -*- lexical-binding: t; -*-
+
+  ;; Copyright (C) 2022
+  ;; SPDX-License-Identifier: MIT
+
+  ;; Author: Tomas Diaz
+
+  ;; Commentary
+
+  ;; General Org configuration
+
+  ;;; Code:
+#+end_src
+* Font hook setup
+
+#+begin_src emacs-lisp
+    (defun tdtron/org-font-setup ()
+      ;; Replace list hyphen with dot
+      (font-lock-add-keywords 'org-mode
+                              '(("^ *\\([-]\\) "
+                                 (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
+
+      ;; Set faces for heading levels
+      (dolist (face '((org-level-1 . 1.2)
+                      (org-level-2 . 1.1)
+                      (org-level-3 . 1.05)
+                      (org-level-4 . 1.0)
+                      (org-level-5 . 1.1)
+                      (org-level-6 . 1.1)
+                      (org-level-7 . 1.1)
+                      (org-level-8 . 1.1)))
+        (set-face-attribute (car face) nil :font "Iosevka Aile" :weight 'medium :height (cdr face)))
+
+      ;; Ensure that anything that should be fixed-pitch in Org files appears that way
+      (set-face-attribute 'org-block nil    :foreground nil :inherit 'fixed-pitch)
+      (set-face-attribute 'org-table nil    :inherit 'fixed-pitch)
+      (set-face-attribute 'org-formula nil  :inherit 'fixed-pitch)
+      (set-face-attribute 'org-code nil     :inherit '(shadow fixed-pitch))
+      (set-face-attribute 'org-table nil    :inherit '(shadow fixed-pitch))
+      (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
+      (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
+      (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
+      (set-face-attribute 'org-checkbox nil  :inherit 'fixed-pitch)
+      (set-face-attribute 'line-number nil :inherit 'fixed-pitch)
+      (set-face-attribute 'line-number-current-line nil :inherit 'fixed-pitch))
+
+
+  ;; (with-eval-after-load 'org-faces (tdtron/org-font-setup))
+  (add-hook 'org-mode-hook 'tdtron/org-font-setup)
+#+end_src
+
+* Turn on indentation and auto-fill mode for Org files
+#+begin_src emacs-lisp
+  (defun tdtron/org-mode-setup ()
+    (org-indent-mode)
+    (variable-pitch-mode 1)
+    (auto-fill-mode 0)
+    (visual-line-mode 1)
+    ;; (diminish org-indent-mode)
+    )
+
+  (add-hook 'org-mode-hook 'tdtron/org-mode-setup)
+#+end_src
+
+* More misc config
+I should check what these were for.
+#+begin_src emacs-lisp
+  (setq org-ellipsis " ▾"
+        org-hide-emphasis-markers t
+        org-src-fontify-natively t
+        org-fontify-quote-and-verse-blocks t
+        org-src-tab-acts-natively t
+        org-edit-src-content-indentation 2
+        org-hide-block-startup nil
+        org-src-preserve-indentation nil
+        org-startup-folded 'content
+        org-cycle-separator-lines 2)
+  ;; Check whether it's worth having this shift support
+  (setq org-support-shift-select t)
+#+end_src
+
+* UI
+#+begin_src emacs-lisp
+  ;; Change headers * for other symbols
+  (straight-use-package 'org-superstar)
+  (add-hook 'org-mode-hook (lambda () (org-superstar-mode 1)))
+  ;; (add-hook 'org-mode 'org-superstar-mode)
+
+  (setq org-superstar-remove-leading-stars t)
+  (setq org-superstar-headline-bullets-list '("◉" "○" "●" "○" "●" "○" "●"))
+
+
+  (defun tdtron/org-mode-visual-fill ()
+    (setq visual-fill-column-width 110
+          visual-fill-column-center-text t)
+    (visual-fill-column-mode 1))
+
+  (straight-use-package 'visual-fill-column)
+  (add-hook 'org-mode-hook 'tdtron/org-mode-visual-fill)
+#+end_src
+
+* Languages
+#+begin_src emacs-lisp
+  ;; (org-babel-do-load-languages
+  ;;  'org-babel-load-languages
+  ;;  '((emacs-lisp . t)
+  ;;    ;; Coq apparently is not working with Babel - https://emacs.stackexchange.com/q/58369/34589
+  ;;    ;; With newer Coq versions, the file 'coq-inferior.el' is no longer packaged with it
+  ;;    ;; (coq . t)
+  ;;    )
+  ;;  )
+
+  ;; ;; This is needed as of Org 9.2
+  (require 'org-tempo)
+
+  (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
+  ;; See org lang load - TLDR: Coq is not working with babel rn
+  (add-to-list 'org-structure-template-alist '("coq" . "src coq"))
+#+end_src
+
+* Provide pkg
+#+begin_src emacs-lisp
+(provide 'tdtron-org)
+;;; tdtron-org.el ends here
+#+end_src

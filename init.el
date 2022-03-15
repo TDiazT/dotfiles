@@ -128,6 +128,12 @@
   (doom-modeline-major-mode-icon nil)
   )
 
+(setq auto-window-vscroll nil)
+(customize-set-variable 'fast-but-imprecise-scrolling t)
+(customize-set-variable 'scroll-conservatively 101)
+(customize-set-variable 'scroll-margin 0)
+(customize-set-variable 'scroll-preserve-screen-position t)
+
 ;; (desktop-save-mode 1)
 
 (delete-selection-mode 1)
@@ -193,6 +199,16 @@
   (setq super-save-auto-save-when-idle t))
 
 (setq-default fill-column 100)
+
+(setq-default indent-tabs-mode nil)
+
+(fset 'yes-or-no-p 'y-or-n-p)
+
+(customize-set-variable 'kill-do-not-save-duplicates t)
+
+(setq-default bidi-paragraph-direction 'left-to-right)
+(setq-default bidi-inhibit-bpa t)
+(global-so-long-mode 1)
 
 (use-package perspective
   :demand t
@@ -739,3 +755,17 @@
 (with-eval-after-load 'lsp-mode
   (require 'lsp-racket)
   (add-hook 'racket-mode-hook #'lsp))
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-selected-packages
+   '(ws-butler which-key visual-fill-column use-package undo-tree tuareg super-save smartparens rainbow-delimiters racket-mode proof-general perspective paredit org-superstar org-roam org-download no-littering multiple-cursors minions magit lsp-ui lsp-treemacs lsp-ivy ivy-rich helpful general geiser flycheck expand-region exec-path-from-shell evil-surround evil-nerd-commenter evil-collection emojify dumb-jump doom-themes doom-modeline dired-single dired-hide-dotfiles diminish counsel-projectile company-coq company-box all-the-icons-dired)))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(mode-line ((t (:height 0.85))))
+ '(mode-line-inactive ((t (:height 0.85)))))
