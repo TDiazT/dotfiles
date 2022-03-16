@@ -57,9 +57,13 @@
 
 (setq-default fill-column 100)
 
-;; (straight-use-package 'racket-mode)
-;; (add-hook 'racket-mode 'racket-xp-mode)
+(straight-use-package 'magit)
+(setq magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1)
 
 (require 'tdtron-org)
 
 (require 'tdtron-keybinds)
+
+(require 'tdtron-org-roam)
+
+(require 'tdtron-racket)

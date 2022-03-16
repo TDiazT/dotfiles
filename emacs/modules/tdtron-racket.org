@@ -1,0 +1,30 @@
+
+#+title Racket config
+#+PROPERTY: header-args:emacs-lisp :tangle tdtron-racket.el :mkdirp yes
+
+#+begin_src emacs-lisp
+  ;;; tdtron-racket.el -*- lexical-binding: t; -*-
+
+  ;; Copyright (C) 2022
+  ;; SPDX-License-Identifier: MIT
+
+  ;; Author: Tomas Diaz
+
+  ;; Commentary
+
+  ;; General Keybinds configuration
+
+  ;;; Code:
+#+end_src
+
+* Setup
+#+begin_src emacs-lisp
+  (straight-use-package 'racket-mode)
+  (add-hook 'racket-mode 'racket-xp-mode)
+#+end_src
+
+* Provide package
+#+begin_src emacs-lisp
+  (provide 'tdtron-racket)
+  ;;; tdtron-racket.el ends here
+#+end_src
