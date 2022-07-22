@@ -1,0 +1,172 @@
+#+title Aux Emacs config
+#+PROPERTY: header-args:emacs-lisp :tangle crafted-emacs.el :mkdirp yes
+
+* Setup
+** Early-init
+#+begin_src emacs-lisp :tangle ./crafted-emacs-early-config.el
+  ;;; crafted-emacs-early-config.el -- Emacs customization file, based on the Crafted config -*- lexical-binding: t; -*-
+  ;; This file is generated from crafted-emacs.org. If you want to edit the
+  ;; configuration, DO NOT edit crafted-emacs-early-config.el, edit crafted-emacs.org, instead.
+  
+  (defvar dotfiles-path
+    (expand-file-name "Projects/dotfiles" (getenv "HOME"))
+    "My dotfiles path")
+#+end_src
+
+** Tangle on save
+
+#+begin_src emacs-lisp
+  ;;; crafted-emacs.el -- Emacs customization file, based on the Crafted config -*- lexical-binding: t; -*-
+  ;; This file is generated from crafted-emacs.org. If you want to edit the
+  ;; configuration, DO NOT edit crafted-emacs.el, edit crafted-emacs.org, instead.
+
+  ;; Tangle the code blocks to crafted-emacs.el on save.
+  (defun org-babel-tangle-config ()
+    (when (string-equal (buffer-file-name)
+                        (expand-file-name "crafted-emacs.org" dotfiles-path))
+      ;; Dynamic scoping to the rescue
+      (let ((org-confirm-babel-evaluate nil))
+        (org-babel-tangle))))
+
+  (add-hook 'org-mode-hook
+            (lambda ()
+              (add-hook 'after-save-hook #'org-babel-tangle-config)))
+#+end_src
+
+** Add crafted-emacs
+#+begin_src emacs-lisp
+  (require 'crafted-defaults)    ; Sensible default settings for Emacs
+  ;; (require 'crafted-use-package) ; Configuration for `use-package`
+  (require 'crafted-updates)     ; Tools to upgrade Crafted Emacs
+  (require 'crafted-completion)  ; selection framework based on `vertico`
+  (require 'crafted-ui)          ; Better UI experience (modeline etc.)
+  (require 'crafted-windows)     ; Window management configuration
+  (require 'crafted-editing)     ; Whitspace trimming, auto parens etc.
+  (require 'crafted-evil)        ; An `evil-mode` configuration
+  (require 'crafted-org)         ; org-appear, clickable hyperlinks etc.
+  (require 'crafted-project)     ; built-in alternative to projectile
+  (require 'crafted-speedbar)    ; built-in file-tree
+  (require 'crafted-screencast)  ; show current command and binding in modeline
+  ;; (require 'crafted-compile)     ; automatically compile some emacs lisp files
+#+end_src
+
+** Adding custom modules
+#+begin_src emacs-lisp
+  (when (or
+         (file-directory-p (expand-file-name "custom-modules/" crafted-config-path))
+         (file-symlink-p (expand-file-name "custom-modules/" crafted-config-path)))
+
+    (add-to-list 'load-path (expand-file-name "custom-modules/" crafted-config-path))
+
+    (let ((default-directory (expand-file-name "custom-modules/" crafted-config-path)))
+      (normal-top-level-add-subdirs-to-load-path))
+    )
+#+end_src
+
+** Env variables
+
+A GNU Emacs library to ensure environment variables inside Emacs look the same as in the user's shell.
+Particularly useful for OS X.
+https://github.com/purcell/exec-path-from-shell
+
+#+begin_src emacs-lisp
+  ; Follow best practice by setting your environment variables so that they are available to both interactive and non-interactive shells. In practical terms, for most people this means setting them in ~/.profile, ~/.bash_profile, ~/.zshenv instead of ~/.bashrc and ~/.zshrc.
+  (when (memq window-system '(mac darwin))
+    (progn (crafted-package-install-package 'exec-path-from-shell)
+           (setq exec-path-from-shell-arguments nil)
+           (exec-path-from-shell-initialize)))
+#+end_src
+
+** OS X Meta rebinding
+Changing the command key to be the META key in Emacs.
+
+#+begin_src emacs-lisp
+  (when (eq system-type 'darwin)
+    (progn (setq mac-command-modifier 'meta)
+           (setq mac-option-modifier 'super)
+           (setq mac-right-option-modifier 'none)))
+#+end_src
+
+* Basic UI configuration
+** Theme
+
+#+begin_src emacs-lisp
+  (crafted-package-install-package 'doom-themes)
+  (progn
+    (disable-theme 'deeper-blue)          ; first turn off the deeper-blue theme
+    (load-theme 'doom-snazzy t))       ; load the doom-palenight theme
+#+end_src
+
+** Font
+
+#+begin_src emacs-lisp
+  (add-hook '
+   emacs-startup-hook
+   (lambda ()
+              (custom-set-faces
+               `(default ((t (:font "FiraCode Nerd Font" :weight light :height 120))))
+               `(fixed-pitch ((t (:inherit (default)))))
+               `(fixed-pitch-serif ((t (:inherit (default)))))
+               `(variable-pitch ((t (:font "Iosevka Aile" :height 120 :weight light)))))))
+#+end_src
+
+** Make titlebar transparent
+#+begin_src emacs-lisp
+  ;;;; Make the titlebar on macOS transparent
+  (when (eq system-type 'darwin)
+    (crafted-package-install-package 'ns-auto-titlebar)
+    (ns-auto-titlebar-mode))
+#+end_src
+
+* Editor
+** Display line number
+#+begin_src emacs-lisp
+  ;; Enabling line numbers
+  (customize-set-variable 'crafted-ui-display-line-numbers t)
+#+end_src
+
+** Auto-save
+#+begin_src emacs-lisp
+  (crafted-package-install-package 'super-save)
+  (super-save-mode +1)
+  (setq super-save-auto-save-when-idle t)
+#+end_src
+
+** Fill column
+#+begin_src emacs-lisp
+  (setq-default fill-column 100)
+#+end_src
+
+* Git
+#+begin_src emacs-lisp
+  (crafted-package-install-package 'magit)
+  (setq magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1)
+#+end_src
+
+* Org-mode
+#+begin_src emacs-lisp
+  (require 'tdtron-org)
+#+end_src
+
+* Evil
+#+begin_src emacs-lisp
+  (customize-set-variable 'crafted-evil-discourage-arrow-keys t)
+
+  (define-key evil-normal-state-map (kbd "C-u") 'evil-scroll-up)
+  (define-key evil-visual-state-map (kbd "C-u") 'evil-scroll-up)
+#+end_src
+
+* Keybinds
+#+begin_src emacs-lisp
+  (require 'tdtron-keybinds)
+#+end_src
+
+* Org Roam
+#+begin_src emacs-lisp
+  (require 'tdtron-org-roam)
+#+end_src
+
+* Racket
+#+begin_src emacs-lisp
+  ;; (require 'tdtron-racket)
+#+end_src

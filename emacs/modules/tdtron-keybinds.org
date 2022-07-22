@@ -29,7 +29,7 @@ Not sure whether to use it or not. With helpful (I believe it's helpful lol), yo
 
 * General
 #+begin_src emacs-lisp
-  (straight-use-package 'general)
+  (crafted-package-install-package 'general)
 
   (general-create-definer tdtron/leader-keys
     :keymaps '(normal insert visual emacs)
@@ -80,8 +80,7 @@ Not sure whether to use it or not. With helpful (I believe it's helpful lol), yo
 
 * Stateful keymaps (Hydra)
 #+begin_src emacs-lisp
-
-  (straight-use-package 'hydra)
+  (crafted-package-install-package 'hydra)
 
   (with-eval-after-load 'coq-mode
     (defhydra hydra-coq ()
@@ -106,7 +105,6 @@ Not sure whether to use it or not. With helpful (I believe it's helpful lol), yo
 
   (tdtron/leader-keys
     "s" '(hydra-text-scale/body :which-key "scale text"))
-
 #+end_src
 
 * Provide package

@@ -21,7 +21,7 @@
                                                   '(:immediate-finish t)))))
     (apply #'org-roam-node-insert args)))
 
-(straight-use-package 'org-roam)
+(crafted-package-install-package 'org-roam)
 
 (setq org-roam-v2-ack t)
 (setq org-roam-directory "~/Projects/Notes")

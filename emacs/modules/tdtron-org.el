@@ -69,7 +69,7 @@
 (setq org-support-shift-select t)
 
 ;; Change headers * for other symbols
-(straight-use-package 'org-superstar)
+(crafted-package-install-package 'org-superstar)
 (add-hook 'org-mode-hook (lambda () (org-superstar-mode 1)))
 ;; (add-hook 'org-mode 'org-superstar-mode)
 
@@ -82,7 +82,7 @@
         visual-fill-column-center-text t)
   (visual-fill-column-mode 1))
 
-(straight-use-package 'visual-fill-column)
+(crafted-package-install-package 'visual-fill-column)
 (add-hook 'org-mode-hook 'tdtron/org-mode-visual-fill)
 
 ;; (org-babel-do-load-languages

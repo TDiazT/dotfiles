@@ -15,7 +15,7 @@
 
 (global-set-key (kbd "C-M-;") 'magit-status)
 
-(straight-use-package 'general)
+(crafted-package-install-package 'general)
 
 (general-create-definer tdtron/leader-keys
   :keymaps '(normal insert visual emacs)
@@ -63,7 +63,7 @@
     "gr"  'magit-rebase)
   )
 
-(straight-use-package 'hydra)
+(crafted-package-install-package 'hydra)
 
 (with-eval-after-load 'coq-mode
   (defhydra hydra-coq ()
