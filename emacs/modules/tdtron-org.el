@@ -78,12 +78,15 @@
 
 
 (defun tdtron/org-mode-visual-fill ()
-  (setq visual-fill-column-width 110
+  (setq visual-fill-column-width 100
         visual-fill-column-center-text t)
   (visual-fill-column-mode 1))
 
 (crafted-package-install-package 'visual-fill-column)
 (add-hook 'org-mode-hook 'tdtron/org-mode-visual-fill)
+
+;; Make symbols appear as unicode (e.g. latex symbols)
+(add-hook 'org-mode-hook 'org-toggle-pretty-entities)
 
 ;; (org-babel-do-load-languages
 ;;  'org-babel-load-languages
