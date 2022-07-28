@@ -68,6 +68,11 @@
   (crafted-package-install-package 'ns-auto-titlebar)
   (ns-auto-titlebar-mode))
 
+;; Make new buffers split vertically instead of horizontally
+;; Taken from https://stackoverflow.com/a/2081978/3802589
+(setq split-height-threshold nil)
+(setq split-width-threshold 0)
+
 ;; Enabling line numbers
 (customize-set-variable 'crafted-ui-display-line-numbers t)
 

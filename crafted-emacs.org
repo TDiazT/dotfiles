@@ -118,6 +118,14 @@ Changing the command key to be the META key in Emacs.
     (ns-auto-titlebar-mode))
 #+end_src
 
+** Make new buffers appear vertically
+#+begin_src emacs-lisp
+  ;; Make new buffers split vertically instead of horizontally
+  ;; Taken from https://stackoverflow.com/a/2081978/3802589
+  (setq split-height-threshold nil)
+  (setq split-width-threshold 0)
+#+end_src
+
 * Editor
 ** Display line number
 #+begin_src emacs-lisp
