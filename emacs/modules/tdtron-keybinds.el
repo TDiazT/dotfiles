@@ -41,6 +41,7 @@
     "rc" '(org-roam-capture :which-key "capture")
     ;; Dailies
     "rj" '(org-roam-dailies-capture-today :which-key "capture today")
+    "ry" '(org-roam-dailies-capture-yesterday :which-key "capture yesterday")
     )
   (define-key org-mode-map (kbd "C-M-i") 'completion-at-point)
   )
