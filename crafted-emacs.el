@@ -28,15 +28,17 @@
 (require 'crafted-screencast)  ; show current command and binding in modeline
 ;; (require 'crafted-compile)     ; automatically compile some emacs lisp files
 
+(customize-set-variable 'crafted-startup-inhibit-splash t)
+
 (when (or
-       (file-directory-p (expand-file-name "custom-modules/" crafted-config-path))
-       (file-symlink-p (expand-file-name "custom-modules/" crafted-config-path)))
+        (file-directory-p (expand-file-name "custom-modules/" crafted-config-path))
+        (file-symlink-p (expand-file-name "custom-modules/" crafted-config-path)))
 
-  (add-to-list 'load-path (expand-file-name "custom-modules/" crafted-config-path))
+(add-to-list 'load-path (expand-file-name "custom-modules/" crafted-config-path))
 
-  (let ((default-directory (expand-file-name "custom-modules/" crafted-config-path)))
+(let ((default-directory (expand-file-name "custom-modules/" crafted-config-path)))
     (normal-top-level-add-subdirs-to-load-path))
-  )
+)
 
 ; Follow best practice by setting your environment variables so that they are available to both interactive and non-interactive shells. In practical terms, for most people this means setting them in ~/.profile, ~/.bash_profile, ~/.zshenv instead of ~/.bashrc and ~/.zshrc.
 (when (memq window-system '(mac darwin))
