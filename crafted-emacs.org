@@ -47,6 +47,7 @@
   (require 'crafted-project)     ; built-in alternative to projectile
   (require 'crafted-speedbar)    ; built-in file-tree
   (require 'crafted-screencast)  ; show current command and binding in modeline
+  (require 'crafted-latex)  ; show current command and binding in modeline
   ;; (require 'crafted-compile)     ; automatically compile some emacs lisp files
 #+end_src
 
@@ -176,6 +177,11 @@ Changing the command key to be the META key in Emacs.
 * Org Roam
 #+begin_src emacs-lisp
   (require 'tdtron-org-roam)
+#+end_src
+
+* Coq
+#+begin_src emacs-lisp
+  (require 'tdtron-coq)
 #+end_src
 
 * Racket

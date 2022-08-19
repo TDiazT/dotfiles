@@ -17,7 +17,7 @@
 (when (memq window-system '(mac ns x))
   (use-package exec-path-from-shell
     :init
-    (setq exec-path-from-shell-arguments '("-l"))
+    (setq exec-path-from-shell-arguments nil)
     (exec-path-from-shell-initialize))
   )
 
@@ -755,17 +755,3 @@
 (with-eval-after-load 'lsp-mode
   (require 'lsp-racket)
   (add-hook 'racket-mode-hook #'lsp))
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(package-selected-packages
-   '(ws-butler which-key visual-fill-column use-package undo-tree tuareg super-save smartparens rainbow-delimiters racket-mode proof-general perspective paredit org-superstar org-roam org-download no-littering multiple-cursors minions magit lsp-ui lsp-treemacs lsp-ivy ivy-rich helpful general geiser flycheck expand-region exec-path-from-shell evil-surround evil-nerd-commenter evil-collection emojify dumb-jump doom-themes doom-modeline dired-single dired-hide-dotfiles diminish counsel-projectile company-coq company-box all-the-icons-dired)))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(mode-line ((t (:height 0.85))))
- '(mode-line-inactive ((t (:height 0.85)))))

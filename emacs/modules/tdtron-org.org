@@ -106,7 +106,6 @@ I should check what these were for.
   (add-hook 'org-mode-hook 'org-toggle-pretty-entities)
 #+end_src
 
-
 * Languages
 #+begin_src emacs-lisp
   ;; (org-babel-do-load-languages
