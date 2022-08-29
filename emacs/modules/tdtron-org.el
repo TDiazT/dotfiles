@@ -88,6 +88,11 @@
 ;; Make symbols appear as unicode (e.g. latex symbols)
 (add-hook 'org-mode-hook 'org-toggle-pretty-entities)
 
+(setq org-entities-user
+      '(("whitediamond" "\\whitediamond" t "&#9671" "d" "d" "◇")
+        ("square" "\\square" t "&#9633" "■" "" "□")
+        ("sqsubseteq" "\\sqsubseteq" t "&#2291" "⊑" "" "⊑")))
+
 ;; (org-babel-do-load-languages
 ;;  'org-babel-load-languages
 ;;  '((emacs-lisp . t)

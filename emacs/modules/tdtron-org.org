@@ -85,25 +85,30 @@ I should check what these were for.
 
 * UI
 #+begin_src emacs-lisp
-  ;; Change headers * for other symbols
-  (crafted-package-install-package 'org-superstar)
-  (add-hook 'org-mode-hook (lambda () (org-superstar-mode 1)))
-  ;; (add-hook 'org-mode 'org-superstar-mode)
+    ;; Change headers * for other symbols
+    (crafted-package-install-package 'org-superstar)
+    (add-hook 'org-mode-hook (lambda () (org-superstar-mode 1)))
+    ;; (add-hook 'org-mode 'org-superstar-mode)
 
-  (setq org-superstar-remove-leading-stars t)
-  (setq org-superstar-headline-bullets-list '("◉" "○" "●" "○" "●" "○" "●"))
+    (setq org-superstar-remove-leading-stars t)
+    (setq org-superstar-headline-bullets-list '("◉" "○" "●" "○" "●" "○" "●"))
 
 
-  (defun tdtron/org-mode-visual-fill ()
-    (setq visual-fill-column-width 100
-          visual-fill-column-center-text t)
-    (visual-fill-column-mode 1))
+    (defun tdtron/org-mode-visual-fill ()
+      (setq visual-fill-column-width 100
+            visual-fill-column-center-text t)
+      (visual-fill-column-mode 1))
 
-  (crafted-package-install-package 'visual-fill-column)
-  (add-hook 'org-mode-hook 'tdtron/org-mode-visual-fill)
+    (crafted-package-install-package 'visual-fill-column)
+    (add-hook 'org-mode-hook 'tdtron/org-mode-visual-fill)
 
-  ;; Make symbols appear as unicode (e.g. latex symbols)
-  (add-hook 'org-mode-hook 'org-toggle-pretty-entities)
+    ;; Make symbols appear as unicode (e.g. latex symbols)
+    (add-hook 'org-mode-hook 'org-toggle-pretty-entities)
+
+    (setq org-entities-user
+          '(("whitediamond" "\\whitediamond" t "&#9671" "d" "d" "◇")
+            ("square" "\\square" t "&#9633" "■" "" "□")
+            ("sqsubseteq" "\\sqsubseteq" t "&#2291" "⊑" "" "⊑")))
 #+end_src
 
 * Languages
