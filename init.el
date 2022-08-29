@@ -1,15 +1,27 @@
-;; The default is 800 kilobytes.  Measured in bytes.
-(setq gc-cons-threshold (* 50 1000 1000))
-
-;; Profile emacs startup
-;; (add-hook 'emacs-startup-hook
-;;           (lambda ()
-;;             (message "Rational Emacs loaded in %s."
-;;                      (emacs-init-time))))
 (add-hook 'emacs-startup-hook
           (lambda ()
-            (message "*** Emacs loaded in %s with %d garbage collections."
-                     (emacs-init-time) gcs-done)))
+            (message "Emacs loaded in %s."
+                     (emacs-init-time))))
+
+(defvar bootstrap-version)
+(let ((bootstrap-file
+       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+      (bootstrap-version 6))
+  (unless (file-exists-p bootstrap-file)
+    (with-current-buffer
+        (url-retrieve-synchronously
+         "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
+         'silent 'inhibit-cookies)
+      (goto-char (point-max))
+      (eval-print-last-sexp)))
+  (load bootstrap-file nil 'nomessage))
+
+;; Install use-package
+(straight-use-package 'use-package)
+
+;; Configure use-package to use straight.el by default
+(use-package straight
+             :custom (straight-use-package-by-default t))
 
 (setq mac-command-modifier 'meta)
 
@@ -21,40 +33,14 @@
     (exec-path-from-shell-initialize))
   )
 
-(require 'package)
-(setq package-archives '(("melpa" . "https://melpa.org/packages/")
-                         ;; Comment/uncomment this line to enable MELPA Stable if desired.
-                         ;; See `package-archive-priorities`
-                         ;; and `package-pinned-packages`.
-                         ;; Most users will not need or want to do this.
-                         ;; ("melpa-stable" . "https://stable.melpa.org/packages/")
-                         ("org" . "https://orgmode.org/elpa/")
-                         ("elpa" . "https://elpa.gnu.org/packages/")))
-
-(package-initialize)
-
-;; Update package contents right away if not updated
-(unless package-archive-contents
-  (package-refresh-contents))
-
-;; Install use-package right away if not installed
-(unless (package-installed-p 'use-package)
-  (package-install 'use-package))
-
-;; All packages with use-package are :ensure t
-(require 'use-package)
-(setq use-package-always-ensure t)
-
-(setq inhibit-startup-message t)
-(scroll-bar-mode -1)        ; Disable visible scrollbar
-(tool-bar-mode -1)          ; Disable the toolbar
-(tooltip-mode -1)           ; Disable tooltips
-(set-fringe-mode 10)       ; Give some breathing room
-
-(menu-bar-mode -1)            ; Disable the menu bar
+;;;; Make the titlebar on macOS transparent
+(when (eq system-type 'darwin)
+  (use-package ns-auto-titlebar
+    :init
+    (ns-auto-titlebar-mode)))
 
 ;; Set up the visible bell
-(setq visible-bell t)
+(customize-set-variable 'visible-bell 1)
 
 ;; Improve scrolling
 (setq mouse-wheel-scroll-amount '(1 ((shift) . 1))) ;; one line at a time
@@ -68,26 +54,40 @@
 (setq split-height-threshold nil)
 (setq split-width-threshold 0)
 
+;; Make it full screen on startup
+(add-to-list 'default-frame-alist '(fullscreen . maximized))
+
+(setq auto-window-vscroll nil)
+(customize-set-variable 'fast-but-imprecise-scrolling t)
+(customize-set-variable 'scroll-conservatively 101)
+(customize-set-variable 'scroll-margin 0)
+(customize-set-variable 'scroll-preserve-screen-position t)
+
 (use-package doom-themes
   :init
+  (disable-theme 'deeper-blue)
   (load-theme 'doom-snazzy t)
-  ;; Not sure what this does exactly... and if I'm calling it correctly
   (doom-themes-visual-bell-config)
   )
 
-(set-face-attribute 'default nil :font "Fira Mono" :height 150)
+(add-hook '
+ emacs-startup-hook
+ (lambda ()
+            (custom-set-faces
+             `(default ((t (:font "FiraCode Nerd Font" :weight light :height 120))))
+             `(fixed-pitch ((t (:inherit (default)))))
+             `(fixed-pitch-serif ((t (:inherit (default)))))
+             `(variable-pitch ((t (:font "Iosevka Aile" :height 120 :weight light)))))))
 
-;; Set the fixed pitch face
-(set-face-attribute 'fixed-pitch nil
-                    :font "JetBrains Mono"
-                    :weight 'light
-                    :height 150)
-
-;; Set the variable pitch face
-(set-face-attribute 'variable-pitch nil
-                    :font "Iosevka Aile"
-                    :height 150
-                    :weight 'light)
+(use-package helpful
+             :bind
+             ([remap describe-function] . helpful-callable)
+             ([remap describe-symbol] . helpful-symbol)
+             ([remap describe-variable] . helpful-variable)
+             ([remap describe-command] . helpful-command)
+             ([remap describe-key] . helpful-key)
+             ("C-h f" . helpful-function)
+             )
 
 ;; Not sure if this is doing anything...
 (setq display-time-format "%l:%M %p %b %y"
@@ -111,7 +111,7 @@
 
 (use-package doom-modeline
   :init (doom-modeline-mode 1)
-  :hook (after-init . doom-modeline-init)
+  :hook (after-init . doom-modeline-mode)
   :custom-face
   (mode-line ((t (:height 0.85))))
   (mode-line-inactive ((t (:height 0.85))))
@@ -119,22 +119,22 @@
   (doom-modeline-height 15)
   (doom-modeline-bar-width 6)
   (doom-modeline-lsp t)
-  (doom-modeline-github nil)
-  (doom-modeline-mu4e nil)
-  (doom-modeline-irc t)
   (doom-modeline-minor-modes t)
-  (doom-modeline-persp-name nil)
   (doom-modeline-buffer-file-name-style 'truncate-except-project)
-  (doom-modeline-major-mode-icon nil)
   )
 
-(setq auto-window-vscroll nil)
-(customize-set-variable 'fast-but-imprecise-scrolling t)
-(customize-set-variable 'scroll-conservatively 101)
-(customize-set-variable 'scroll-margin 0)
-(customize-set-variable 'scroll-preserve-screen-position t)
+;; Bind extra `describe-*' commands
+(global-set-key (kbd "C-h K") #'describe-keymap)
 
-;; (desktop-save-mode 1)
+(defun pulse-line (&rest _)
+  "Pulse the current line."
+  (pulse-momentary-highlight-one-line (point)))
+
+(dolist (command '(scroll-up-command scroll-down-command
+                                     recenter-top-bottom other-window))
+  (advice-add command :after #'pulse-line))
+
+(desktop-save-mode 1)
 
 (delete-selection-mode 1)
 
@@ -147,17 +147,6 @@
 ;; Override some modes which derive from the above
 (dolist (mode '(org-mode-hook))
   (add-hook mode (lambda () (display-line-numbers-mode 0))))
-
-;; Multiple-cursors, let's you have multiple cursors
-(use-package multiple-cursors
-  :ensure t
-  :bind
-  (("C->"         . mc/mark-next-like-this)
-   ("C-<"         . mc/mark-previous-like-this)
-   ("C-c C-<"     . mc/mark-all-like-this)
-   ("C-S-c C-S-c"   . mc/edit-lines)
-   )
-  )
 
 ;; Taken from https://github.com/anachronic/emacs.d/blob/master/elisp/setup-editor.el
 ;; Let's you transpose lines like IntelliJ
@@ -187,9 +176,9 @@
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
 
 ;; Automatically clean whitespaces
-(use-package ws-butler
-  :hook ((text-mode . ws-butler-mode)
-         (prog-mode . ws-butler-mode)))
+;; (use-package ws-butler
+;;   :hook ((text-mode . ws-butler-mode)
+;;          (prog-mode . ws-butler-mode)))
 
 (use-package super-save
   :defer 1
@@ -202,7 +191,11 @@
 
 (setq-default indent-tabs-mode nil)
 
-(fset 'yes-or-no-p 'y-or-n-p)
+;; N.B. Emacs 28 has a variable for using short answers, which should
+;; be preferred if using that version or higher.
+(if (boundp 'use-short-answers)
+    (setq use-short-answers t)
+  (advice-add 'yes-or-no-p :override #'y-or-n-p))
 
 (customize-set-variable 'kill-do-not-save-duplicates t)
 
@@ -210,21 +203,134 @@
 (setq-default bidi-inhibit-bpa t)
 (global-so-long-mode 1)
 
-(use-package perspective
-  :demand t
-  :bind (("C-M-k" . persp-switch)
-         ("C-M-n" . persp-next)
-         ("C-x k" . persp-kill-buffer*)
-         ("C-x b" . persp-counsel-switch-buffer))
+;; Revert Dired and other buffers
+(customize-set-variable 'global-auto-revert-non-file-buffers t)
+
+;; Revert buffers when the underlying file has changed
+(global-auto-revert-mode 1)
+
+(electric-pair-mode 1) ; auto-insert matching bracket
+(show-paren-mode 1) ; turn on paren match highlighting
+
+(use-package rainbow-delimiters
+  :hook (prog-mode . rainbow-delimiters-mode)
+  )
+
+(defun tdtron/minibuffer-backward-kill (arg)
+  "When minibuffer is completing a file name delete up to parent
+folder, otherwise delete a word"
+  (interactive "p")
+  (if minibuffer-completing-file-name
+      ;; Borrowed from https://github.com/raxod502/selectrum/issues/498#issuecomment-803283608
+      (if (string-match-p "/." (minibuffer-contents))
+          (zap-up-to-char (- arg) ?/)
+        (delete-minibuffer-contents))
+    (backward-kill-word arg)))
+
+(use-package vertico
+  :init
+  (vertico-mode)
   :custom
-  (persp-initial-frame-name "Main")
+  (vertico-cycle t)
+  )
+
+;; Configure directory extension.
+(use-package vertico-directory
+  :after vertico
+  :straight nil
+  :load-path "straight/repos/vertico/extensions/"
+  :bind ( :map vertico-map
+          ("RET" . vertico-directory-enter)
+          ("DEL" . vertico-directory-delete-char)
+          ("M-DEL" . vertico-directory-delete-word))
+  :hook (rfn-eshadow-update-overlay . vertico-directory-tidy))
+
+  (with-eval-after-load 'evil
+    (define-key vertico-map (kbd "C-j") 'vertico-next)
+    (define-key vertico-map (kbd "C-k") 'vertico-previous)
+    (define-key vertico-map (kbd "M-h") 'vertico-directory-up))
+
+(use-package marginalia
+  :init
+  (marginalia-mode)
+  :custom
+  (marginalia-annotators '(marginalia-annotators-heavy marginalia-annotators-light nil))
+  )
+
+(use-package consult
+  :bind
+  ("C-s" . consult-line)
   :config
-  ;; Running `persp-mode' multiple times resets the perspective list...
-  (unless (equal persp-mode t)
-    (persp-mode)))
+  (define-key minibuffer-local-map (kbd "C-r") 'consult-history)
+  (setq completion-in-region-function #'consult-completion-in-region)
+  )
+
+(use-package orderless
+  :custom
+  (completion-styles '(orderless))
+  (completion-category-overrides  '((file (styles . (partial-completion))))))
+
+(use-package embark
+  :bind
+  ("C-." . embark-act)
+  ([remap describe-bindings] . embark-bindings)
+  :config
+  ;; Use Embark to show bindings in a key prefix with `C-h`
+  (setq prefix-help-command #'embark-prefix-help-command)
+  )
+
+(use-package embark-consult
+  :after (embark consult)
+  :demand t ; only necessary if you have the hook below
+  ;; if you want to have consult previews as you move around an
+  ;; auto-updating embark collect buffer
+  :hook
+  (embark-collect-mode . consult-preview-at-point-mode)
+  )
+
+(use-package corfu-doc)
+
+(use-package corfu
+    :init
+    (global-corfu-mode)
+    :custom
+    (corfu-cycle t) ; Allows cycling through candidates
+    (corfu-auto t)  ; Enable auto completion
+    (corfu-auto-prefix 2) ; Complete with less prefix keys
+    (corfu-auto-delay 0.0) ; No delay for completion
+    (corfu-echo-documentation 0.25) ; Echo docs for current completion option
+
+    :hook (corfu-mode . corfu-doc-mode)
+
+    :bind (:map corfu-map
+                ("M-p" . corfu-doc-scroll-down)
+                ("M-n" . corfu-doc-scroll-up)
+                ("M-d" . corfu-doc-toggle))
+    )
+
+(add-hook 'eshell-mode-hook
+          (lambda () (setq-local corfu-quit-at-boundary t
+                            corfu-quit-no-match t
+                            corfu-auto nil)
+            (corfu-mode)))
+
+(use-package cape
+  :init
+  ;; Add `completion-at-point-functions', used by `completion-at-point'.
+  (add-to-list 'completion-at-point-functions #'cape-dabbrev)
+  (add-to-list 'completion-at-point-functions #'cape-file)
+  ;; Silence the pcomplete capf, no errors or messages!
+  ;; Important for corfu
+  (advice-add 'pcomplete-completions-at-point :around #'cape-wrap-silent)
+
+  ;; Ensure that pcomplete does not write to the buffer
+  ;; and behaves as a pure `completion-at-point-function'.
+  (advice-add 'pcomplete-completions-at-point :around #'cape-wrap-purify)
+  )
 
 (use-package dired
   :ensure nil
+  :straight nil
   :commands (dired dired-jump)
 
   :custom
@@ -255,88 +361,87 @@
 
 (use-package no-littering
   :custom
-  (setq auto-save-file-name-transforms
-        `((".*" ,(no-littering-expand-var-file-name "auto-save/") t)))
-  (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
+  (auto-save-file-name-transforms
+   `((".*" ,(no-littering-expand-var-file-name "auto-save/") t)))
+  (custom-file (expand-file-name "custom.el" user-emacs-directory))
   )
 
-(recentf-mode 1)
+(add-hook 'after-init-hook #'recentf-mode)
 (global-set-key (kbd "C-M-e") 'recentf-open-files)
 
-(use-package which-key
-  :init (which-key-mode)
-  :diminish which-key-mode
-  :config
-  (setq which-key-idle-delay 0.3))
+(add-hook 'after-save-hook #'executable-make-buffer-file-executable-if-script-p)
+
+;; (use-package which-key
+;;   :init (which-key-mode)
+;;   :diminish which-key-mode
+;;   :config
+;;   (setq which-key-idle-delay 0.3))
 
 (use-package general
-  :config
-  (general-create-definer tdtron/leader-keys
-    :keymaps '(normal insert visual emacs)
-    :prefix "SPC"
-    :global-prefix "C-SPC"
+    :config
+    (general-create-definer tdtron/leader-keys
+      :keymaps '(normal insert visual emacs)
+      :prefix "SPC"
+      :global-prefix "C-SPC"
+      )
     )
-  )
 
-;; Sets initial evil mode to emacs for these modes
-;; (defun tdtron/evil-hook ()
-;;   (dolist (mode '(custom-mode
-;;                   eshell-mode
-;;                   git-rebase-mode
-;;                   term-mode))
-;;     (add-to-list 'evil-emacs-state-modes mode)))
- (use-package undo-tree
-   :init
-   (global-undo-tree-mode 1)
-   :config
-   (setq undo-tree-auto-save-history nil))
+;; General purpose Toggles
+  (tdtron/leader-keys
+    "t"  '(:ignore t :which-key "toggles")
+    "tw" 'whitespace-mode
+    "tt" '(load-theme :which-key "choose theme"))
 
-(use-package evil
-  :init
-  (setq evil-want-integration t)
-  (setq evil-want-keybinding nil)
-  (setq evil-want-C-u-scroll t)
-  (setq evil-want-C-i-jump nil)
-  (setq evil-respect-visual-line-mode t)
-  (setq evil-undo-system 'undo-tree)
+  ;; Org-roam
+  (with-eval-after-load 'org-roam-mode
+    (tdtron/leader-keys
+      "r" '(:ignore t :which-key "org-roam")
+      "rl"  '(org-roam-buffer-toggle :which-key "buffer toggle")
+      "rf" '(org-roam-node-find :which-key "find")
+      "rg" '(org-roam-graph :which-key "graph")
+      "ri" '(org-roam-node-insert :which-key "insert")
+      "rI" '(org-roam-node-insert-immediate :which-key "insert immediate")
+      "rc" '(org-roam-capture :which-key "capture")
+      ;; Dailies
+      "rj" '(org-roam-dailies-capture-today :which-key "capture today")
+      "ry" '(org-roam-dailies-capture-yesterday :which-key "capture yesterday")
+      )
+    (define-key org-mode-map (kbd "C-M-i") 'completion-at-point)
+    )
 
-  ;; :hook (evil-mode . tdtron/evil-hook)
-  :config
-  (evil-mode 1)
-  (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
-  (define-key evil-insert-state-map (kbd "C-h") 'evil-delete-backward-char-and-join)
-
-  ;; Use visual line motions even outside of visual-line-mode buffers
-  (evil-global-set-key 'motion "j" 'evil-next-visual-line)
-  (evil-global-set-key 'motion "k" 'evil-previous-visual-line)
-  (evil-set-initial-state 'messages-buffer-mode 'normal)
-  (evil-set-initial-state 'dashboard-mode 'normal))
-
-(use-package evil-collection
-  :after evil
-  :init
-  (setq evil-collection-company-use-tng nil)  ;; Is this a bug in evil-collection?
-  :custom
-  (evil-collection-outline-bind-tab-p nil)
-  :config
-  (setq evil-collection-mode-list
-        (remove 'lispy evil-collection-mode-list))
-  (evil-collection-init))
-
-(global-set-key (kbd "C-M-u") 'universal-argument)
-
-(use-package evil-surround
-  :config
-  (global-evil-surround-mode 1))
+  ;; Magit
+  (with-eval-after-load 'magit
+    (tdtron/leader-keys
+      "g"   '(:ignore t :which-key "git")
+      "gs"  'magit-status
+      "gd"  'magit-diff-unstaged
+      "gc"  'magit-branch-or-checkout
+      "gl"   '(:ignore t :which-key "log")
+      "glc" 'magit-log-current
+      "glf" 'magit-log-buffer-file
+      "gb"  'magit-branch
+      "gP"  'magit-push-current
+      "gp"  'magit-pull-branch
+      "gf"  'magit-fetch
+      "gF"  'magit-fetch-all
+      "gr"  'magit-rebase)
+    )
 
 (use-package hydra)
 
-(defhydra hydra-coq ()
-  "Coq actions"
-  ("j" proof-assert-next-command-interactive "Next")
-  ("k" proof-undo-last-successful-command "Undo")
-  ("f" nil "finished" :exit t)
-  )
+
+(with-eval-after-load 'coq-mode
+  (defhydra hydra-coq ()
+    "Coq actions"
+    ("j" proof-assert-next-command-interactive "Next")
+    ("k" proof-undo-last-successful-command "Undo")
+    ("f" nil "finished" :exit t)
+    )
+  (tdtron/leader-keys
+    "c"   '(:ignore t :which-key "coq")
+    "cs"  '(coq-Search :which-key "search")
+    "ci"  '(hydra-coq/body :which-key "interactive")
+    ))
 
 (defhydra hydra-text-scale (:timeout 5)
   "scale text"
@@ -354,100 +459,183 @@
 (tdtron/leader-keys
   "s" '(hydra-text-scale/body :which-key "scale text"))
 
-(tdtron/leader-keys
- "t"  '(:ignore t :which-key "toggles")
- "tw" 'whitespace-mode
- "tt" '(counsel-load-theme :which-key "choose theme"))
+;; Sets initial evil mode to emacs for these modes
+(defun tdtron/evil-hook ()
+  (dolist (mode '(custom-mode
+                  eshell-mode
+                  git-rebase-mode
+                  term-mode))
+    (add-to-list 'evil-emacs-state-modes mode)))
+
+
+  (use-package evil
+    :init
+    (setq evil-want-integration t)
+    (setq evil-want-keybinding nil)
+    (setq evil-want-C-u-scroll t)
+    (setq evil-want-C-i-jump nil)
+    (setq evil-respect-visual-line-mode t)
+
+    :hook (evil-mode . tdtron/evil-hook)
+    :custom
+    ;; C-h is backspace in insert state
+    (customize-set-variable 'evil-want-C-h-delete t)
+
+    :config
+    (evil-mode 1)
+    ;; Make C-g revert to normal state
+    (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
+
+    ;; Make evil search more like vim
+    (evil-select-search-module 'evil-search-module 'evil-search)
+
+    ;; Rebind `universal-argument' to 'C-M-u' since 'C-u' now scrolls the buffer
+    (global-set-key (kbd "C-M-u") 'universal-argument)
+    ;; Use visual line motions even outside of visual-line-mode buffers
+    (evil-global-set-key 'motion "j" 'evil-next-visual-line)
+    (evil-global-set-key 'motion "k" 'evil-previous-visual-line)
+    (evil-set-initial-state 'messages-buffer-mode 'normal)
+    (evil-set-initial-state 'dashboard-mode 'normal))
+
+  ;; Turn on undo-tree globally
+  (when (< emacs-major-version 28)
+    (use-package undo-tree
+      :after evil
+      :init
+      (global-undo-tree-mode 1)
+      :config
+      (setq undo-tree-auto-save-history nil)))
+
+  (if (< emacs-major-version 28)
+      (customize-set-variable 'evil-undo-system 'undo-tree)
+    (customize-set-variable 'evil-undo-system 'undo-redo))
+
+(use-package evil-collection
+  :after evil
+       ; (setq evil-collection-company-use-tng nil)  ;; Is this a bug in evil-collection?
+  :custom
+       (evil-collection-outline-bind-tab-p nil)
+       :config
+       (setq evil-collection-mode-list
+             (remove 'lispy evil-collection-mode-list))
+       (evil-collection-init))
+
+(use-package evil-nerd-commenter
+  :init
+  ;; Turn on Evil Nerd Commenter
+  (evilnc-default-hotkeys))
+
+
+(use-package evil-surround
+  :config
+  (global-evil-surround-mode 1))
 
 (defun tdtron/org-font-setup ()
-  ;; Replace list hyphen with dot
-  (font-lock-add-keywords 'org-mode
-                          '(("^ *\\([-]\\) "
-                             (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
+   ;; Replace list hyphen with dot
+   (font-lock-add-keywords 'org-mode
+                           '(("^ *\\([-]\\) "
+                              (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
 
-  ;; Set faces for heading levels
-  (dolist (face '((org-level-1 . 1.2)
-                  (org-level-2 . 1.1)
-                  (org-level-3 . 1.05)
-                  (org-level-4 . 1.0)
-                  (org-level-5 . 1.1)
-                  (org-level-6 . 1.1)
-                  (org-level-7 . 1.1)
-                  (org-level-8 . 1.1)))
-    (set-face-attribute (car face) nil :font "Iosevka Aile" :weight 'medium :height (cdr face)))
+   ;; Set faces for heading levels
+   (dolist (face '((org-level-1 . 1.2)
+                   (org-level-2 . 1.1)
+                   (org-level-3 . 1.05)
+                   (org-level-4 . 1.0)
+                   (org-level-5 . 1.1)
+                   (org-level-6 . 1.1)
+                   (org-level-7 . 1.1)
+                   (org-level-8 . 1.1)))
+     (set-face-attribute (car face) nil :font "Iosevka Aile" :weight 'medium :height (cdr face)))
 
-  ;; Ensure that anything that should be fixed-pitch in Org files appears that way
-  (set-face-attribute 'org-block nil    :foreground nil :inherit 'fixed-pitch)
-  (set-face-attribute 'org-table nil    :inherit 'fixed-pitch)
-  (set-face-attribute 'org-formula nil  :inherit 'fixed-pitch)
-  (set-face-attribute 'org-code nil     :inherit '(shadow fixed-pitch))
-  (set-face-attribute 'org-table nil    :inherit '(shadow fixed-pitch))
-  (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
-  (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
-  (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
-  (set-face-attribute 'org-checkbox nil  :inherit 'fixed-pitch)
-  (set-face-attribute 'line-number nil :inherit 'fixed-pitch)
-  (set-face-attribute 'line-number-current-line nil :inherit 'fixed-pitch))
+   ;; Ensure that anything that should be fixed-pitch in Org files appears that way
+   (set-face-attribute 'org-block nil    :foreground nil :inherit 'fixed-pitch)
+   (set-face-attribute 'org-table nil    :inherit 'fixed-pitch)
+   (set-face-attribute 'org-formula nil  :inherit 'fixed-pitch)
+   (set-face-attribute 'org-code nil     :inherit '(shadow fixed-pitch))
+   (set-face-attribute 'org-table nil    :inherit '(shadow fixed-pitch))
+   (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
+   (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
+   (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
+   (set-face-attribute 'org-checkbox nil  :inherit 'fixed-pitch)
+   (set-face-attribute 'line-number nil :inherit 'fixed-pitch)
+   (set-face-attribute 'line-number-current-line nil :inherit 'fixed-pitch))
 
-;; Turn on indentation and auto-fill mode for Org files
-(defun tdtron/org-mode-setup ()
-  (org-indent-mode)
-  (variable-pitch-mode 1)
-  (auto-fill-mode 0)
-  (visual-line-mode 1)
-  (diminish org-indent-mode)
-  )
+;; Tangle on save
+ (defun org-babel-tangle-config ()
+   (when (string-equal (buffer-file-name)
+                       (expand-file-name "Emacs.org"
+                                         (expand-file-name "Projects/dotfiles" (getenv "HOME"))))
+     ;; Dynamic scoping to the rescue
+     (let ((org-confirm-babel-evaluate nil))
+       (org-babel-tangle))))
 
-(use-package org
-  :defer t
-  :commands (org-capture org-agenda)
-  :hook (org-mode . tdtron/org-mode-setup)
-  ;; Consider using :custom instead and not setq
-  :config
-  (setq org-ellipsis " ▾"
-        org-hide-emphasis-markers t
-        org-src-fontify-natively t
-        org-fontify-quote-and-verse-blocks t
-        org-src-tab-acts-natively t
-        org-edit-src-content-indentation 2
-        org-hide-block-startup nil
-        org-src-preserve-indentation nil
-        org-startup-folded 'content
-        org-cycle-separator-lines 2)
-  (setq org-agenda-files
-        '("~/Projects/Coq-PL/Org/"))
-  (tdtron/org-font-setup)
-  :custom
-  ;; Check whether it's worth having this shift support
-  (org-support-shift-select t)
+ ;; Turn on indentation and auto-fill mode for Org files
+ (defun tdtron/org-mode-setup ()
+   (org-indent-mode)
+   (variable-pitch-mode 1)
+   (auto-fill-mode 0)
+   (visual-line-mode 1)
+   (diminish org-indent-mode)
+   )
 
-  )
+ (use-package org
+   :defer t
+   :commands (org-capture org-agenda)
+   :hook (org-mode . tdtron/org-mode-setup)
+   :hook (org-mode . (lambda ()
+                       (add-hook 'after-save-hook #'org-babel-tangle-config)))
+   :hook (org-mode . org-toggle-pretty-entities)
+   ;; Consider using :custom instead and not setq
+   :config
+   (setq org-ellipsis " ▾"
+         org-hide-emphasis-markers t
+         org-src-fontify-natively t
+         org-fontify-quote-and-verse-blocks t
+         org-src-tab-acts-natively t
+         org-edit-src-content-indentation 2
+         org-hide-block-startup nil
+         org-src-preserve-indentation nil
+         org-startup-folded 'content
+         org-cycle-separator-lines 2)
+   (tdtron/org-font-setup)
+
+   :custom
+   ;; Check whether it's worth having this shift support
+   (org-support-shift-select t)
+   ;; Return or left-click with mouse follows link
+   (org-return-follows-link t)
+   (org-mouse-1-follows-link t)
+   ;; Display links as the description provided
+   (org-link-descriptive t)
+   ;; Hide markup markers
+   (org-hide-emphasis-markers t)
+   (org-entities-user
+    '(("square" "\\square" t "&#9633" "■" "" "□")
+      ("sqsubseteq" "\\sqsubseteq" t "&#2291" "⊑" "" "⊑")))
+   )
 
 ;; Change headers * for other symbols
-(use-package org-superstar
-  :after org
-  :hook (org-mode . org-superstar-mode)
-  :custom
-  (org-superstar-remove-leading-stars t)
-  (org-superstar-headline-bullets-list '("◉" "○" "●" "○" "●" "○" "●")))
+ (use-package org-superstar
+   :after org
+   :hook (org-mode . org-superstar-mode)
+   :custom
+   (org-superstar-remove-leading-stars t)
+   (org-superstar-headline-bullets-list '("◉" "○" "●" "○" "●" "○" "●")))
 
 
-(defun tdtron/org-mode-visual-fill ()
-  (setq visual-fill-column-width 110
-        visual-fill-column-center-text t)
-  (visual-fill-column-mode 1))
+ (defun tdtron/org-mode-visual-fill ()
+   (setq visual-fill-column-width 110
+         visual-fill-column-center-text t)
+   (visual-fill-column-mode 1))
 
-(use-package visual-fill-column
-  :defer t
-  :hook (org-mode . tdtron/org-mode-visual-fill))
+ (use-package visual-fill-column
+   :defer t
+   :hook (org-mode . tdtron/org-mode-visual-fill))
 
-;; Revert Dired and other buffers
-(setq global-auto-revert-non-file-buffers t)
+(use-package org-appear
+  :hook (org-mode . org-appear-mode))
 
-;; Revert buffers when the underlying file has changed
-(global-auto-revert-mode 1)
-
-(use-package org-download)
+;; (use-package org-download)
 
 (with-eval-after-load 'org
   (org-babel-do-load-languages
@@ -510,17 +698,6 @@
 
      )
    )
-  :bind (("C-c r l" . org-roam-buffer-toggle)
-         ("C-c r f" . org-roam-node-find)
-         ("C-c r g" . org-roam-graph)
-         ("C-c r i" . org-roam-node-insert)
-         ("C-c r I" . org-roam-node-insert-immediate)
-         ("C-c r c" . org-roam-capture)
-         ;; Dailies
-         ("C-c r j" . org-roam-dailies-capture-today)
-         :map org-mode-map
-         ("C-M-i" . completion-at-point)
-         )
   )
 
 ;; (use-package org-roam-ui
@@ -537,164 +714,84 @@
 ;;           org-roam-ui-update-on-save t
 ;;           org-roam-ui-open-on-start t))
 
-;; Ivy
-(use-package ivy
-  :diminish
-  :bind (("C-s" . swiper)
-         :map ivy-minibuffer-map
-         ("TAB" . ivy-alt-done)
-         ("C-f" . ivy-alt-done)
-         ("C-l" . ivy-alt-done)
-         ("C-j" . ivy-next-line)
-         ("C-k" . ivy-previous-line)
-         :map ivy-switch-buffer-map
-         ("C-k" . ivy-previous-line)
-         ("C-l" . ivy-done)
-         ("C-d" . ivy-switch-buffer-kill)
-         :map ivy-reverse-i-search-map
-         ("C-k" . ivy-previous-line)
-         ("C-d" . ivy-reverse-i-search-kill))
-  :init
-  (ivy-mode 1) ;; This sets everything up, including remapping find file to use Ivy
-  )
-
-;; Ivy rich
-(use-package ivy-rich
-  :init (ivy-rich-mode 1)
-  )
-
-
-;; Counsel
-;; General user interface (UI) to narrow down a list of selections by typing.
-;; Same devs as Ivy
-(use-package counsel
-  :demand t
-  :bind (("M-x" . counsel-M-x)
-         ;; ("C-x b" . counsel-ibuffer)
-         ("C-x C-f" . counsel-find-file)
-         ;; ("C-M-j" . counsel-switch-buffer)
-         ("C-M-l" . counsel-imenu)
-         :map minibuffer-local-map
-         ("C-r" . 'counsel-minibuffer-history))
-  :config
-  (setq ivy-initial-inputs-alist nil)) ;; Don't start searches with ^
-
-
-;; Swiper
-;; I think Swiper comes with ivy installation
-(use-package swiper)
-
 ;; Syntax check
-(use-package flycheck
-  :defer t
-  :hook (coq-mode . flycheck-mode))
+;; (use-package flycheck
+;;   :defer t
+;;   :hook (coq-mode . flycheck-mode))
 
 (use-package yasnippet
   :hook (prog-mode . yas-minor-mode)
   :config
   (yas-reload-all))
 
-;; (use-package smartparens
-  ;;   :hook (prog-mode . smartparens-mode))
-
-;; Checking paredit for Racket dev
-(use-package paredit
-  :ensure t
-  :config
-  (dolist (m '(emacs-lisp-mode-hook
-               racket-mode-hook
-               racket-repl-mode-hook))
-    (add-hook m #'paredit-mode))
-  (bind-keys :map paredit-mode-map
-             ("{"   . paredit-open-curly)
-             ("}"   . paredit-close-curly))
-  (unless terminal-frame
-    (bind-keys :map paredit-mode-map
-               ("M-[" . paredit-wrap-square)
-               ("M-{" . paredit-wrap-curly))))
-;; ;;
-;; Highlight matching parens
-(use-package paren
-  :config
-  (set-face-attribute 'show-paren-match-expression nil :background "#363e4a")
-  (show-paren-mode 1))
-
-(use-package rainbow-delimiters
-  :hook (prog-mode . rainbow-delimiters-mode)
-  )
-
-(use-package evil-nerd-commenter
-  :bind ("M-/" . evilnc-comment-or-uncomment-lines))
-
-(setq history-length 25)
 (savehist-mode 1)
 
 (save-place-mode 1)
 
-(defun tdtron/lsp-mode-setup ()
-  (setq lsp-headerline-breadcrumb-segments '(path-up-to-project file symbols))
-  (lsp-headerline-breadcrumb-mode))
+;; (defun tdtron/lsp-mode-setup ()
+;;   (setq lsp-headerline-breadcrumb-segments '(path-up-to-project file symbols))
+;;   (lsp-headerline-breadcrumb-mode))
 
-(use-package lsp-mode
-  :commands (lsp lsp-deferred)
-  :hook (lsp-mode . tdtron/lsp-mode-setup)
-  :init
-  (setq lsp-keymap-prefix "C-c l")  ;; Or 'C-l', 's-l'
-  :config
-  (lsp-enable-which-key-integration t))
+;; (use-package lsp-mode
+;;   :commands (lsp lsp-deferred)
+;;   :hook (lsp-mode . tdtron/lsp-mode-setup)
+;;   :init
+;;   (setq lsp-keymap-prefix "C-c l")  ;; Or 'C-l', 's-l'
+;;   :config
+;;   (lsp-enable-which-key-integration t))
 
-(use-package lsp-ui
-  :hook (lsp-mode . lsp-ui-mode)
-  :custom
-  (lsp-ui-doc-position 'bottom))
+;; (use-package lsp-ui
+;;   :hook (lsp-mode . lsp-ui-mode)
+;;   :custom
+;;   (lsp-ui-doc-position 'bottom))
 
-(use-package lsp-treemacs
-  :after lsp)
+;; (use-package lsp-treemacs
+;;   :after lsp)
 
-(use-package lsp-ivy)
+;; (use-package lsp-ivy)
 
-(use-package company
-  :after lsp-mode
-  :hook (lsp-mode . company-mode)
-  :bind (:map company-active-map
-         ("<tab>" . company-complete-selection))
-        (:map lsp-mode-map
-         ("<tab>" . company-indent-or-complete-common))
-  :custom
-  (company-minimum-prefix-length 1)
-  (company-idle-delay 0.0))
+;; (use-package company
+;;   :after lsp-mode
+;;   :hook (lsp-mode . company-mode)
+;;   :bind (:map company-active-map
+;;          ("<tab>" . company-complete-selection))
+;;         (:map lsp-mode-map
+;;          ("<tab>" . company-indent-or-complete-common))
+;;   :custom
+;;   (company-minimum-prefix-length 1)
+;;   (company-idle-delay 0.0))
 
-(use-package company-box
-  :hook (company-mode . company-box-mode))
+;; (use-package company-box
+;;   :hook (company-mode . company-box-mode))
 
-(defun tdtron/switch-project-action ()
-  "Switch to a workspace with the project name and start `magit-status'."
-  ;; TODO: Switch to EXWM workspace 1?
-  (persp-switch (projectile-project-name))
-  (magit-status))
+;; (defun tdtron/switch-project-action ()
+;;   "Switch to a workspace with the project name and start `magit-status'."
+;;   ;; TODO: Switch to EXWM workspace 1?
+;;   (persp-switch (projectile-project-name))
+;;   (magit-status))
 
-(use-package projectile
-  :diminish projectile-mode
-  :config (projectile-mode)
-  :demand t
-  :bind ("C-M-o" . projectile-find-file)
-  :bind-keymap
-  ("C-c p" . projectile-command-map)
+;; (use-package projectile
+;;   :diminish projectile-mode
+;;   :config (projectile-mode)
+;;   :demand t
+;;   :bind ("C-M-o" . projectile-find-file)
+;;   :bind-keymap
+;;   ("C-c p" . projectile-command-map)
 
-  :init
-  (when (file-directory-p "~/Projects")
-    (setq projectile-project-search-path '("~/Projects")))
-  (setq projectile-switch-project-action #'tdtron/switch-project-action)
-  ;; (setq projectile-switch-project-action #'projectile-dired)
+;;   :init
+;;   (when (file-directory-p "~/Projects")
+;;     (setq projectile-project-search-path '("~/Projects")))
+;;   (setq projectile-switch-project-action #'tdtron/switch-project-action)
+;;   ;; (setq projectile-switch-project-action #'projectile-dired)
 
-  )
+;;   )
 
-(use-package counsel-projectile
-  :after projectile
-  :config
-  (counsel-projectile-mode)
-  :bind ("C-S-f" . counsel-projectile-rg)
-  )
+;; (use-package counsel-projectile
+;;   :after projectile
+;;   :config
+;;   (counsel-projectile-mode)
+;;   :bind ("C-S-f" . counsel-projectile-rg)
+;;   )
 
 (use-package magit
   :bind ("C-M-;" . magit-status)
@@ -702,56 +799,26 @@
   (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
 
   ;; Forge
-  ;; (use-package forge)
-
-(tdtron/leader-keys
-  "g"   '(:ignore t :which-key "git")
-  "gs"  'magit-status
-  "gd"  'magit-diff-unstaged
-  "gc"  'magit-branch-or-checkout
-  "gl"   '(:ignore t :which-key "log")
-  "glc" 'magit-log-current
-  "glf" 'magit-log-buffer-file
-  "gb"  'magit-branch
-  "gP"  'magit-push-current
-  "gp"  'magit-pull-branch
-  "gf"  'magit-fetch
-  "gF"  'magit-fetch-all
-  "gr"  'magit-rebase)
+;;   ;; (use-package forge)
 
 (use-package proof-general
   :config
-  (setq coq-prog-name "/Users/tomas/.opam/_coq-platform_.2021.02.1/bin/coqtop")
-  ;; (setq coq-prog-name "/Users/tomas/.opam/coq.8.13/bin/coqtop")
   (setq proof-three-window-mode-policy 'hybrid) ;; Set default layout to hybrid
-  (setq proof-three-window-enable t) ;; Set 3 window enabled
-;; proof-locked-face allows customizing background color I think
   )
 
 (use-package company-coq
-  :init
+  :hook
   ;; Load company-coq when opening Coq files
-  (add-hook 'coq-mode-hook #'company-coq-mode))
+  (coq-mode . company-coq-mode))
 
-(use-package helpful
-  :custom
-  (counsel-describe-function-function #'helpful-callable)
-  (counsel-describe-variable-function #'helpful-variable)
-  :bind
-  ([remap describe-function] . helpful-function)
-  ([remap describe-symbol] . helpful-symbol)
-  ([remap describe-variable] . helpful-variable)
-  ([remap describe-command] . helpful-command)
-  ([remap describe-key] . helpful-key))
+;; (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
-(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+;; (use-package tuareg)
 
-(use-package tuareg)
+;; (use-package racket-mode
+;;              :mode "\\.rkt\\'"
+;;   :hook (racket-mode . racket-xp-mode)   )
 
-(use-package racket-mode
-  :mode "\\.rkt\\'"
-  :hook (racket-mode . racket-xp-mode)   )
-
-(with-eval-after-load 'lsp-mode
-  (require 'lsp-racket)
-  (add-hook 'racket-mode-hook #'lsp))
+;; (with-eval-after-load 'lsp-mode
+;;   (require 'lsp-racket)
+;;   (add-hook 'racket-mode-hook #'lsp))
