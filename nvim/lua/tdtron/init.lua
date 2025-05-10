@@ -1,0 +1,5 @@
+require("tdtron.set")
+require("tdtron.remap")
+require("tdtron.lazy_init")
+require("tdtron.lsp")
+require("tdtron.colorscheme")
