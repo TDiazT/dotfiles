@@ -28,8 +28,8 @@ local lspconfig = require("lspconfig")
 local on_attach = function (_, bufnr)
         -- Set up buffer-local keymaps (vim.api.nvim_buf_set_keymap()), etc.
         local opts = { noremap = true, silent = true, buffer = bufnr }
-        vim.keymap.set("n", "<leader>lgD", vim.lsp.buf.declaration, opts)
-        vim.keymap.set("n", "<leader>lgd", vim.lsp.buf.definition, opts)
+        vim.keymap.set("n", "<leader>C-b", vim.lsp.buf.declaration, opts)
+        vim.keymap.set("n", "<leader>C-.", vim.lsp.buf.definition, opts)
         vim.keymap.set("n", "<leader>lh", vim.lsp.buf.hover, opts)
         vim.keymap.set("n", "<leader>ld", vim.diagnostic.open_float, opts)
         vim.keymap.set("n", "<leader>lr", vim.lsp.buf.rename, opts)
