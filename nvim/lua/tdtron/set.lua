@@ -3,6 +3,9 @@ vim.opt.nu = true
 vim.opt.relativenumber = true
 vim.opt.cursorline = true           -- highlight cursor line underneath the cursor horizontally
 vim.opt.termguicolors = true
+vim.opt.splitbelow = true -- open new vertical split bottom
+vim.opt.splitright = true -- open new horizontal splits right
+vim.opt.showmode = false -- we are experienced, and we don't need the "-- INSERT --" mode hint
 
 -- Tab
 vim.opt.tabstop = 4                 -- number of visual spaces per TAB
@@ -28,3 +31,7 @@ vim.opt.updatetime = 50
 
 -- Displays column at X char
 -- vim.opt.colorcolumn = "80"
+
+-- File explorer
+-- vim.g.loaded_netrw = 1
+-- vim.g.loaded_netrwPlugin = 1
