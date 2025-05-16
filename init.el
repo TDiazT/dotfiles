@@ -288,7 +288,7 @@ folder, otherwise delete a word"
   (embark-collect-mode . consult-preview-at-point-mode)
   )
 
-(use-package corfu-doc)
+;; (use-package corfu-doc)
 
 (use-package corfu
     :init
@@ -300,12 +300,12 @@ folder, otherwise delete a word"
     (corfu-auto-delay 0.0) ; No delay for completion
     (corfu-echo-documentation 0.25) ; Echo docs for current completion option
 
-    :hook (corfu-mode . corfu-doc-mode)
+    :hook (corfu-mode . corfu-popupinfo-mode)
 
     :bind (:map corfu-map
-                ("M-p" . corfu-doc-scroll-down)
-                ("M-n" . corfu-doc-scroll-up)
-                ("M-d" . corfu-doc-toggle))
+                ("M-p" . corfu-popupinfo-scroll-down)
+                ("M-n" . corfu-popupinfo-scroll-up)
+                ("M-d" . corfu-popupinfo-toggle))
     )
 
 (add-hook 'eshell-mode-hook
