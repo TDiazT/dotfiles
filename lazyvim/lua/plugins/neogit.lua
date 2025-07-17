@@ -7,4 +7,7 @@ return {
     -- Only one of these is needed.
     "folke/snacks.nvim", -- optional
   },
+  keys = {
+    { "<leader>gg", "<cmd>Neogit<cr>", desc = "Neogit" },
+  },
 }
