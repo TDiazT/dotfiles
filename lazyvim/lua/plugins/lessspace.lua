@@ -1,0 +1,3 @@
+return {
+  "thirtythreeforty/lessspace.vim",
+}
