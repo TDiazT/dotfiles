@@ -4,15 +4,15 @@ return {
   -- tag = "v2.15", -- uncomment to pin to a specific release
   init = function()
     -- VimTeX configuration goes here, e.g.
-    local view_method
     if vim.fn.has("mac") then
-      view_method = "skim"
+      vim.g.vimtex_view_method = "skim"
+      vim.g.vimtex_view_skim_sync = 1
+      vim.g.vimtex_view_skim_reading_bar = 1
+      vim.g.vimtex_view_skim_activate = 1
     elseif vim.fn.has("linux") then
-      view_method = "zathura"
+      vim.g.vimtex_view_method = "zathura"
     else
-      view_method = ""
+      vim.g.vimtex_view_method = ""
     end
-
-    vim.g.vimtex_view_method = view_method
   end,
 }
