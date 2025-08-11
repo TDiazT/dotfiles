@@ -223,7 +223,13 @@ bar {
         status_command i3status
 }
 
-bindsym $mod+Shift+x exec i3lock
+bindsym $mod+Shift+x exec i3lock -n -i $HOME/Pictures/wallpaper-torres-del-paine.jpg \
+    --inside-color=373445ff --ring-color=ffffffff --line-uses-inside \
+    --keyhl-color=d23c3dff --bshl-color=d23c3dff --separator-color=00000000 \
+    --insidever-color=fecf4dff --insidewrong-color=d23c3dff \
+    --ringver-color=ffffffff --ringwrong-color=ffffffff --ind-pos="x+86:y+1003" \
+    --radius=15 --verif-text="" --wrong-text=""
+
 
 # start rofi (a program launcher)
 bindsym $mod+p exec rofi -show drun
