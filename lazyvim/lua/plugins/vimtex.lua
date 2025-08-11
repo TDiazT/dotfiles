@@ -4,15 +4,24 @@ return {
   -- tag = "v2.15", -- uncomment to pin to a specific release
   init = function()
     -- VimTeX configuration goes here, e.g.
-    if vim.fn.has("mac") then
+    if vim.fn.has("mac") == 1 then
       vim.g.vimtex_view_method = "skim"
       vim.g.vimtex_view_skim_sync = 1
       vim.g.vimtex_view_skim_reading_bar = 1
       vim.g.vimtex_view_skim_activate = 1
-    elseif vim.fn.has("linux") then
+    elseif vim.fn.has("linux") == 1 then
       vim.g.vimtex_view_method = "zathura"
     else
       vim.g.vimtex_view_method = ""
     end
+    vim.g.vimtex_compiler_latexmk = {
+      options = {
+        "-verbose",
+        "-file-line-error",
+        "-synctex=1",
+        "-interaction=nonstopmode",
+        "-shell-escape",
+      },
+    }
   end,
 }
