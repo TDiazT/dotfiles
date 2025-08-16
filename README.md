@@ -31,3 +31,4 @@
 - spotify-launcher
 - rg
 - [NVM](https://github.com/nvm-sh/nvm)
+- [treesitter-cli](https://github.com/tree-sitter/tree-sitter/blob/master/crates/cli/README.md)
