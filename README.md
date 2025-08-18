@@ -10,6 +10,8 @@
 ## Arch setup
 
 - [Hyprland](https://wiki.hypr.land/)
+  - hypridle
+  - hyprlock
 - ttf-firacode-nerd
 - [oh-my-zsh](https://github.com/ohmyzsh/ohmyzsh)
   - [zsh-autosuggestions](https://github.com/zsh-users/zsh-autosuggestions/blob/master/INSTALL.md#oh-my-zsh)
@@ -32,3 +34,14 @@
 - rg
 - [NVM](https://github.com/nvm-sh/nvm)
 - [treesitter-cli](https://github.com/tree-sitter/tree-sitter/blob/master/crates/cli/README.md)
+- sddm
+  - qt6-declarative
+  - qt6-svg
+  - qt6-virtualkeyboard
+  - qt6-multimedia-ffmpeg
+- quickshell
+- Screen Sharing
+  - xdg-desktop-portal-hyprland
+  - xdg-desktop-portal-gtk
+  - umockdev
+- Waybar
