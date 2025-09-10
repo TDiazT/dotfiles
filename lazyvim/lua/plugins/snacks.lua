@@ -6,13 +6,13 @@ return {
         files = {
           hidden = true,
           ignored = true,
+          exclude = { "node_modules", ".git", "_build", "*.vo*", "*.glob", "*.aux" },
         },
-        explorer = { hidden = true, ignored = true, exclude = { "node_modules", ".git", "_build" } },
-      },
-      files = {
-        hidden = true,
-        ignored = true,
-        exclude = { "node_modules", ".git", "_build" },
+        explorer = {
+          hidden = true,
+          ignored = true,
+          exclude = { "node_modules", ".git", "_build", "*.vo*", "*.glob", "*.aux" },
+        },
       },
     },
   },
