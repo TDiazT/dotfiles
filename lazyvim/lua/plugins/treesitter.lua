@@ -5,7 +5,6 @@ return {
     vim.list_extend(opts.ensure_installed, {
       "ocaml",
       "ocaml_interface",
-      "latex",
       "bibtex",
       "gitcommit",
       "gitignore",
