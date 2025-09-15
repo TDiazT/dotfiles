@@ -6,3 +6,5 @@
 -- Set to `false` to globally disable all snacks animations
 vim.g.snacks_animate = false
 vim.wo.wrap = true
+-- Enable local search for config files
+vim.opt.exrc = true
