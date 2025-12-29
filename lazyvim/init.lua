@@ -2,6 +2,5 @@
 require("config.lazy")
 require("config.godot")
 
-local lspconfig = require("lspconfig")
-lspconfig.ocamllsp.setup({})
-lspconfig.gdscript.setup({})
+vim.lsp.enable("ocamllsp")
+vim.lsp.enable("gdscript")
