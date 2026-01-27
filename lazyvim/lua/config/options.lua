@@ -8,3 +8,4 @@ vim.g.snacks_animate = false
 vim.wo.wrap = true
 -- Enable local search for config files
 vim.opt.exrc = true
+vim.o.autoread = true
